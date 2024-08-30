@@ -1,5 +1,6 @@
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Resource, ResourceName } from 'src/app/interfaces';
 
 @Component({
   selector: 'app-resource-item',
@@ -9,7 +10,11 @@ import { CommonModule } from '@angular/common';
   styleUrl: './resourceItem.component.scss',
 })
 export class ResourceItemComponent {
-  @Input() public name!: string;
-  @Input() public quantity!: number;
-  @Input() public productionRate!: number;
+  @Input() public resource!: Resource;
+  @Input() public resourceName!: ResourceName;
+  @Output() public increment = new EventEmitter<ResourceName>();
+
+  protected handleClick() {
+    this.increment.emit(this.resourceName);
+  }
 }

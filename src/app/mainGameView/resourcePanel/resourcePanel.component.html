@@ -1,6 +1,7 @@
 <p>resourcePanel works!</p>
 <app-resource-item
-  name="coal"
-  [quantity]="0"
-  [productionRate]="0"
+  *ngFor="let resource of signal().player.resources | keyvalue"
+  [resourceName]="resource.key"
+  [resource]="resource.value"
+  (increment)="handleChange($event)"
 ></app-resource-item>
