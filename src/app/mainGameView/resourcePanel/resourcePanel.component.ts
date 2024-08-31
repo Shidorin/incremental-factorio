@@ -21,6 +21,6 @@ export class ResourcePanelComponent {
   }
 
   handleChange(resourceName: ResourceName) {
-    this.gameStateService.updateResource(resourceName);
+    this.gameStateService.incrementResource(resourceName);
   }
 }

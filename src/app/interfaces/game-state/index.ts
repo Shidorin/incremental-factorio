@@ -2,7 +2,7 @@ export * from './game-state.interface';
 export * from './player.interface';
 export * from './player-resources.interface';
 export * from './products.interface';
-export * from './buildings.interface';
+export * from './building-types.interface';
 export * from './upgrades.interface';
 export * from './storage-capacity.interface';
 export * from './progression.interface';
