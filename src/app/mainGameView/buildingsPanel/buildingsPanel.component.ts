@@ -1,8 +1,8 @@
 import { Component, inject, WritableSignal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { GameState, BuildingName } from 'src/app/interfaces';
-import { GameStateService } from 'src/app/services/game-state.service';
 import { BuildingItemComponent } from './buildingItem/buildingItem.component';
+import { GameStateService, BuildingService } from 'src/app/services/gameState';
 
 @Component({
   selector: 'app-buildings-panel',
@@ -13,14 +13,16 @@ import { BuildingItemComponent } from './buildingItem/buildingItem.component';
 })
 export class BuildingsPanelComponent {
   public gameStateService: GameStateService;
+  public buildingService: BuildingService;
   public signal: WritableSignal<GameState>;
 
   public constructor() {
     this.gameStateService = inject(GameStateService);
+    this.buildingService = inject(BuildingService);
     this.signal = this.gameStateService.getSignal();
   }
 
   handleChange(buildingName: BuildingName) {
-    this.gameStateService.incrementBuilding(buildingName);
+    this.buildingService.incrementBuilding(buildingName);
   }
 }
