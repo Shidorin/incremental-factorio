@@ -8,3 +8,9 @@ export interface BuildingTypes {
 }
 
 export type BuildingName = 'drills' | 'furnaces' | 'assemblers' | 'labs';
+
+export interface BuildingConfig {
+  baseCost: number;
+  scalingFactor: number;
+  // Add other attributes as needed, like build time, resource requirements, etc.
+}

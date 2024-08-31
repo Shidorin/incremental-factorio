@@ -1,6 +1,5 @@
-import { inject, Injectable, signal, WritableSignal } from '@angular/core';
-import { BuildingName, GameState, ResourceName } from '../../interfaces';
-import { BuildingService, ResourceService } from './index';
+import { Injectable, signal, WritableSignal } from '@angular/core';
+import { GameState } from '../../interfaces';
 
 @Injectable({
   providedIn: 'root',
@@ -9,12 +8,12 @@ export class GameStateService {
   private initialGameState: GameState = {
     player: {
       resources: {
-        stone: { name: 'stone', quantity: 0, productionRate: 0 },
-        coal: { name: 'coal', quantity: 0, productionRate: 0 },
-        copper: { name: 'copper', quantity: 0, productionRate: 0 },
-        iron: { name: 'iron', quantity: 0, productionRate: 0 },
-        oil: { name: 'oil', quantity: 0, productionRate: 0 },
-        uran: { name: 'uran', quantity: 0, productionRate: 0 },
+        stone: { name: 'stone', quantity: 0, productionRate: 0, capacity: 10 },
+        coal: { name: 'coal', quantity: 0, productionRate: 0, capacity: 10 },
+        // copper: { name: 'copper', quantity: 0, productionRate: 0 },
+        // iron: { name: 'iron', quantity: 0, productionRate: 0 },
+        // oil: { name: 'oil', quantity: 0, productionRate: 0 },
+        // uran: { name: 'uran', quantity: 0, productionRate: 0 },
       },
       products: {
         copperPlate: 0,
@@ -29,8 +28,8 @@ export class GameStateService {
         greenScience: 0,
       },
       buildings: {
-        drills: { name: 'drills', quantity: 0, cost: 10 },
-        furnaces: { name: 'furnaces', quantity: 0, cost: 0 },
+        drills: { name: 'drills', quantity: 0, cost: 5 },
+        furnaces: { name: 'furnaces', quantity: 0, cost: 5 },
         assemblers: { name: 'assemblers', quantity: 0, cost: 0 },
         labs: { name: 'labs', quantity: 0, cost: 0 },
       },

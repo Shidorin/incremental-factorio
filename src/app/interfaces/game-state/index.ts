@@ -4,7 +4,6 @@ export * from './player-resources.interface';
 export * from './products.interface';
 export * from './building-types.interface';
 export * from './upgrades.interface';
-export * from './storage-capacity.interface';
 export * from './progression.interface';
 export * from './perks.interface';
 export * from './resource.interface';

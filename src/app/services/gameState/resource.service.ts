@@ -12,19 +12,29 @@ export class ResourceService {
     this.gameStateSignal = this.gameStateService.getSignal();
   }
 
-  public incrementResource(name: ResourceName) {
-    this.gameStateSignal.update((current: GameState) => ({
-      ...current,
-      player: {
-        ...current.player,
-        resources: {
-          ...current.player.resources,
-          [name]: {
-            ...current.player.resources[name],
-            quantity: current.player.resources[name].quantity + 1,
+  private canMine(resourceName: ResourceName) {
+    let quantity =
+      this.gameStateSignal().player.resources[resourceName].quantity;
+    let capacity =
+      this.gameStateSignal().player.resources[resourceName].capacity;
+
+    return quantity < capacity;
+  }
+
+  public incrementResource(resourceName: ResourceName) {
+    if (this.canMine(resourceName))
+      this.gameStateSignal.update((current: GameState) => ({
+        ...current,
+        player: {
+          ...current.player,
+          resources: {
+            ...current.player.resources,
+            [resourceName]: {
+              ...current.player.resources[resourceName],
+              quantity: current.player.resources[resourceName].quantity + 1,
+            },
           },
         },
-      },
-    }));
+      }));
   }
 }
