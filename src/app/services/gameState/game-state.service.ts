@@ -28,10 +28,29 @@ export class GameStateService {
         greenScience: 0,
       },
       buildings: {
-        drills: { name: 'drills', quantity: 0, cost: 5 },
-        furnaces: { name: 'furnaces', quantity: 0, cost: 5 },
-        assemblers: { name: 'assemblers', quantity: 0, cost: 0 },
-        labs: { name: 'labs', quantity: 0, cost: 0 },
+        drills: {
+          name: 'drills',
+          quantity: 0,
+          cost: {
+            stone: { count: 5, baseCost: 5, scalingFactor: 1.6 },
+            coal: { count: 5, baseCost: 5, scalingFactor: 1.6 },
+          },
+        },
+        furnaces: {
+          name: 'furnaces',
+          quantity: 0,
+          cost: { stone: { count: 5, baseCost: 5, scalingFactor: 1.6 } },
+        },
+        assemblers: {
+          name: 'assemblers',
+          quantity: 0,
+          cost: { stone: { count: 5, baseCost: 5, scalingFactor: 1.6 } },
+        },
+        labs: {
+          name: 'labs',
+          quantity: 0,
+          cost: { stone: { count: 5, baseCost: 5, scalingFactor: 1.6 } },
+        },
       },
       upgrades: {
         storageCapacity: {

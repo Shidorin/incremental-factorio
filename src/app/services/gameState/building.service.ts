@@ -1,5 +1,10 @@
 import { inject, Injectable, WritableSignal } from '@angular/core';
-import { GameState, BuildingName, BuildingConfig } from 'src/app/interfaces';
+import {
+  GameState,
+  BuildingName,
+  ResourceName,
+  BuildingCost,
+} from 'src/app/interfaces';
 import { GameStateService } from './game-state.service';
 
 @Injectable({
@@ -9,103 +14,146 @@ export class BuildingService {
   gameStateService: GameStateService;
   gameStateSignal: WritableSignal<GameState>;
 
-  buildingConfig: Record<BuildingName, BuildingConfig> = {
-    drills: { baseCost: 5, scalingFactor: 1.6 },
-    furnaces: { baseCost: 5, scalingFactor: 1.5 },
-    assemblers: { baseCost: 15, scalingFactor: 1.25 },
-    labs: { baseCost: 25, scalingFactor: 1.4 },
-  };
-
   constructor() {
     this.gameStateService = inject(GameStateService);
     this.gameStateSignal = this.gameStateService.getSignal();
   }
 
+  /**
+   * Calculates the cost of a drill based on its current or next quantity.
+   * @param buildingName - The name of the building.
+   * @param forNextPurchase - If true, calculates the cost for the next building purchase.
+   * @returns The BuildingCost object with updated costs.
+   */
   private calculateDrillCost(
     buildingName: BuildingName,
-    incrementedCount?: boolean
-  ): number {
-    let result;
+    forNextPurchase: boolean = false
+  ): BuildingCost {
+    let result: BuildingCost = {};
     let building = this.gameStateSignal().player.buildings[buildingName];
-    let config = this.buildingConfig[buildingName];
+    let quantity = building.quantity + (forNextPurchase ? 1 : 0);
 
-    result = Math.ceil(
-      config.baseCost *
-        Math.pow(
-          config.scalingFactor,
-          incrementedCount ? building.quantity + 1 : building.quantity
-        )
-    );
+    Object.entries(building.cost).forEach(([key, value]) => {
+      result[key] = {
+        ...value,
+        count: Math.ceil(
+          value.baseCost * Math.pow(value.scalingFactor, quantity)
+        ),
+      };
+    });
+
     return result;
   }
 
+  /**
+   * Calculates the cost of a furnace based on its current or next quantity.
+   * @param buildingName - The name of the building.
+   * @param forNextPurchase - If true, calculates the cost for the next building purchase.
+   * @returns The BuildingCost object with updated costs.
+   */
   private calculateFurnaceCost(
     buildingName: BuildingName,
-    incrementedCount?: boolean
-  ): number {
-    let result;
+    forNextPurchase: boolean = false
+  ): BuildingCost {
+    let result: BuildingCost = {};
     let building = this.gameStateSignal().player.buildings[buildingName];
-    let config = this.buildingConfig[buildingName];
+    let quantity = building.quantity + (forNextPurchase ? 1 : 0);
 
-    result = Math.ceil(
-      config.baseCost *
-        Math.pow(
-          config.scalingFactor,
-          incrementedCount ? building.quantity + 1 : building.quantity
-        )
-    );
+    Object.entries(building.cost).forEach(([key, value]) => {
+      result[key] = {
+        ...value,
+        count: Math.ceil(
+          value.baseCost * Math.pow(value.scalingFactor, quantity)
+        ),
+      };
+    });
+
     return result;
   }
 
+  /**
+   * Calculates the cost of a building based on its current or next quantity.
+   * @param buildingName - The name of the building.
+   * @param forNextPurchase - If true, calculates the cost for the next building purchase.
+   * @returns The BuildingCost object with updated costs.
+   */
   private calculateBuildingCost(
     buildingName: BuildingName,
-    incrementedCount?: boolean
-  ): number {
-    let result: number = -1;
-    let currentCount =
-      this.gameStateSignal().player.buildings[buildingName].quantity;
-    if (incrementedCount) currentCount++;
+    forNextPurchase: boolean = false
+  ): BuildingCost {
+    let result: BuildingCost = {};
 
     switch (buildingName) {
       case 'drills':
-        result = this.calculateDrillCost(buildingName, incrementedCount);
+        result = this.calculateDrillCost(buildingName, forNextPurchase);
         break;
       case 'furnaces':
-        result = this.calculateFurnaceCost(buildingName, incrementedCount);
+        result = this.calculateFurnaceCost(buildingName, forNextPurchase);
         break;
+      // Add more cases here for other buildings as needed
       default:
         break;
     }
     return result;
   }
 
-  private canBuild(buildingName: BuildingName) {
-    const requiredStone =
-      this.gameStateSignal().player.buildings[buildingName].cost;
-    return (
-      this.gameStateSignal().player.resources.stone.quantity >= requiredStone
+  /**
+   * Checks if building can be afforded.
+   * @param costs - Cost of the building.
+   * @returns true if can be afforded.
+   */
+  private canAfford(costs: BuildingCost): boolean {
+    const resources = this.gameStateSignal().player.resources;
+    return Object.entries(costs).every(
+      ([resource, amount]) =>
+        resources[resource as ResourceName]?.quantity >= amount.count
     );
   }
 
-  private buyBuilding(
+  /**
+   * Deducts resources based on cost.
+   * @param costs - Cost of the building.
+   */
+  private deductResource(costs: BuildingCost): void {
+    this.gameStateSignal.update((current: GameState) => {
+      const updatedResources = { ...current.player.resources };
+
+      Object.entries(costs).forEach(([resource, amount]) => {
+        const resourceName = resource as ResourceName;
+
+        if (updatedResources[resourceName]) {
+          updatedResources[resourceName].quantity -= amount.count;
+        }
+      });
+
+      return {
+        ...current,
+        player: {
+          ...current.player,
+          resources: updatedResources,
+        },
+      };
+    });
+  }
+  /**
+   * Purchase logic.
+   * @param buildingName - The name of the building.
+   * @param requiredCost - Cost of the building.
+   * @param incrementBuildingFn - increments building quantity.
+   */
+  private purchaseBuilding(
     buildingName: BuildingName,
-    requiredCost: number,
+    requiredCost: BuildingCost,
     incrementBuildingFn: (current: GameState) => number
-  ) {
+  ): void {
+    this.deductResource(requiredCost);
+
     let newCost = this.calculateBuildingCost(buildingName, true);
-    if (newCost === -1) return;
 
     this.gameStateSignal.update((current: GameState) => ({
       ...current,
       player: {
         ...current.player,
-        resources: {
-          ...current.player.resources,
-          stone: {
-            ...current.player.resources.stone,
-            quantity: current.player.resources.stone.quantity - requiredCost,
-          },
-        },
         buildings: {
           ...current.player.buildings,
           [buildingName]: {
@@ -118,10 +166,16 @@ export class BuildingService {
     }));
   }
 
-  public incrementBuilding(buildingName: BuildingName) {
-    let canBuild = this.canBuild(buildingName);
-    if (canBuild) {
-      this.buyBuilding(
+  /**
+   * communication with a component
+   * @param buildingName - The name of the building.
+   */
+  public incrementBuilding(buildingName: BuildingName): void {
+    const currentCost =
+      this.gameStateSignal().player.buildings[buildingName].cost;
+
+    if (this.canAfford(currentCost)) {
+      this.purchaseBuilding(
         buildingName,
         this.calculateBuildingCost(buildingName),
         (current) => current.player.buildings[buildingName].quantity + 1
