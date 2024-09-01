@@ -1,1 +1,7 @@
 <p>buildingsPanel works!</p>
+<app-building-item
+  *ngFor="let building of signal().player.buildings | keyvalue"
+  [buildingName]="building.key"
+  [building]="building.value"
+  (increment)="handleChange($event)"
+></app-building-item>

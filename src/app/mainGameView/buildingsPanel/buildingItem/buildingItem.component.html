@@ -1,0 +1,9 @@
+<div class="building-bar" (click)="handleClick()">
+  <p>name: {{ building.name }}</p>
+  <p>quantity: {{ building.quantity }}</p>
+  <ul>
+    <li *ngFor="let entry of getCostEntries()">
+      {{ entry[0] }}: {{ entry[1] }}
+    </li>
+  </ul>
+</div>

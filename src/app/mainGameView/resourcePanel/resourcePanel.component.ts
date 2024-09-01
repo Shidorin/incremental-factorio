@@ -1,8 +1,8 @@
 import { Component, inject, WritableSignal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ResourceItemComponent } from './resourceItem/resourceItem.component';
-import { GameStateService } from 'src/app/services/game-state.service';
 import { GameState, ResourceName } from 'src/app/interfaces/';
+import { GameStateService, ResourceService } from 'src/app/services/gameState';
 
 @Component({
   selector: 'app-resource-panel',
@@ -13,14 +13,16 @@ import { GameState, ResourceName } from 'src/app/interfaces/';
 })
 export class ResourcePanelComponent {
   public gameStateService: GameStateService;
+  public resourceService: ResourceService;
   public signal: WritableSignal<GameState>;
 
   public constructor() {
     this.gameStateService = inject(GameStateService);
+    this.resourceService = inject(ResourceService);
     this.signal = this.gameStateService.getSignal();
   }
 
   handleChange(resourceName: ResourceName) {
-    this.gameStateService.updateResource(resourceName);
+    this.resourceService.incrementResource(resourceName);
   }
 }
