@@ -1,12 +1,13 @@
-export interface Products {
-  copperPlate: number;
-  ironPlate: number;
-  steel: number;
-  copperCable: number;
-  ironGearWheel: number;
-  greenCircuit: number;
-  belt: number;
-  inserter: number;
-  redScience: number;
-  greenScience: number;
-}
+import { ResourceName, ProductName } from 'src/app/enums';
+
+export type Products = {
+  [productName in ProductName]: number;
+};
+
+export type BuildingCost = {
+  [resourceName in ResourceName]?: {
+    count: number;
+    baseCost: number;
+    scalingFactor: number;
+  };
+};

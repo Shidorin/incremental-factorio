@@ -1,8 +1,9 @@
 import { Component, inject, WritableSignal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { GameState, BuildingName } from 'src/app/interfaces';
+import { GameState } from 'src/app/interfaces';
 import { BuildingItemComponent } from './buildingItem/buildingItem.component';
 import { GameStateService, BuildingService } from 'src/app/services/gameState';
+import { BuildingName } from 'src/app/enums';
 
 @Component({
   selector: 'app-buildings-panel',

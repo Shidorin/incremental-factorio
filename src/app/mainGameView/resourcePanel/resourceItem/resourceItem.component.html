@@ -1,5 +1,9 @@
-<div class="resource-bar" (click)="handleClick()">
-  <p>name: {{ resource.name }}</p>
-  <p>quantity: {{ resource.quantity }}/{{ resource.capacity }}</p>
-  <p>productionRate: {{ resource.productionRate }}</p>
+<div class="resource-bar">
+  <div (click)="handleClick()">
+    <p>name: {{ resource.name }}</p>
+    <p>quantity: {{ resource.quantity }}/{{ resource.capacity }}</p>
+    <p>productionRate: {{ resource.productionRate }}</p>
+  </div>
+  <button (click)="handleDrillChangeButton(true)">+</button>
+  <button (click)="handleDrillChangeButton(false)">-</button>
 </div>

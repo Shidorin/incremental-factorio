@@ -1,13 +1,14 @@
+import { BuildingCost, ProductName, ResourceName, STATUS } from 'src/app/enums';
+
 export interface Building {
   name: string;
   quantity: number;
   cost: BuildingCost;
+  fuelUsage: number;
+  assignments: assignment[] | [];
 }
 
-export interface BuildingCost {
-  [resourceName: string]: {
-    count: number;
-    baseCost: number;
-    scalingFactor: number;
-  };
+export interface assignment {
+  status: STATUS;
+  job?: ResourceName | ProductName;
 }
