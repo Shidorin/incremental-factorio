@@ -1,169 +1,24 @@
-import { inject, Injectable, WritableSignal } from '@angular/core';
-import {
-  GameState,
-  BuildingName,
-  ResourceName,
-  BuildingCost,
-} from 'src/app/interfaces';
+import { Injectable, WritableSignal } from '@angular/core';
+import { Building, GameState, Resource } from 'src/app/interfaces';
 import { GameStateService } from './game-state.service';
+import { BuildingName, ResourceName, STATUS } from 'src/app/enums';
+import {
+  BuildingCostCalculatorService,
+  BuildingManagerService,
+} from './building/index';
 
 @Injectable({
   providedIn: 'root',
 })
 export class BuildingService {
-  gameStateService: GameStateService;
   gameStateSignal: WritableSignal<GameState>;
 
-  constructor() {
-    this.gameStateService = inject(GameStateService);
+  constructor(
+    private gameStateService: GameStateService,
+    private costCalculator: BuildingCostCalculatorService,
+    private buildingManager: BuildingManagerService
+  ) {
     this.gameStateSignal = this.gameStateService.getSignal();
-  }
-
-  /**
-   * Calculates the cost of a drill based on its current or next quantity.
-   * @param buildingName - The name of the building.
-   * @param forNextPurchase - If true, calculates the cost for the next building purchase.
-   * @returns The BuildingCost object with updated costs.
-   */
-  private calculateDrillCost(
-    buildingName: BuildingName,
-    forNextPurchase: boolean = false
-  ): BuildingCost {
-    let result: BuildingCost = {};
-    let building = this.gameStateSignal().player.buildings[buildingName];
-    let quantity = building.quantity + (forNextPurchase ? 1 : 0);
-
-    Object.entries(building.cost).forEach(([key, value]) => {
-      result[key] = {
-        ...value,
-        count: Math.ceil(
-          value.baseCost * Math.pow(value.scalingFactor, quantity)
-        ),
-      };
-    });
-
-    return result;
-  }
-
-  /**
-   * Calculates the cost of a furnace based on its current or next quantity.
-   * @param buildingName - The name of the building.
-   * @param forNextPurchase - If true, calculates the cost for the next building purchase.
-   * @returns The BuildingCost object with updated costs.
-   */
-  private calculateFurnaceCost(
-    buildingName: BuildingName,
-    forNextPurchase: boolean = false
-  ): BuildingCost {
-    let result: BuildingCost = {};
-    let building = this.gameStateSignal().player.buildings[buildingName];
-    let quantity = building.quantity + (forNextPurchase ? 1 : 0);
-
-    Object.entries(building.cost).forEach(([key, value]) => {
-      result[key] = {
-        ...value,
-        count: Math.ceil(
-          value.baseCost * Math.pow(value.scalingFactor, quantity)
-        ),
-      };
-    });
-
-    return result;
-  }
-
-  /**
-   * Calculates the cost of a building based on its current or next quantity.
-   * @param buildingName - The name of the building.
-   * @param forNextPurchase - If true, calculates the cost for the next building purchase.
-   * @returns The BuildingCost object with updated costs.
-   */
-  private calculateBuildingCost(
-    buildingName: BuildingName,
-    forNextPurchase: boolean = false
-  ): BuildingCost {
-    let result: BuildingCost = {};
-
-    switch (buildingName) {
-      case 'drills':
-        result = this.calculateDrillCost(buildingName, forNextPurchase);
-        break;
-      case 'furnaces':
-        result = this.calculateFurnaceCost(buildingName, forNextPurchase);
-        break;
-      // Add more cases here for other buildings as needed
-      default:
-        break;
-    }
-    return result;
-  }
-
-  /**
-   * Checks if building can be afforded.
-   * @param costs - Cost of the building.
-   * @returns true if can be afforded.
-   */
-  private canAfford(costs: BuildingCost): boolean {
-    const resources = this.gameStateSignal().player.resources;
-    return Object.entries(costs).every(
-      ([resource, amount]) =>
-        resources[resource as ResourceName]?.quantity >= amount.count
-    );
-  }
-
-  /**
-   * Deducts resources based on cost.
-   * @param costs - Cost of the building.
-   */
-  private deductResource(costs: BuildingCost): void {
-    this.gameStateSignal.update((current: GameState) => {
-      const updatedResources = { ...current.player.resources };
-
-      Object.entries(costs).forEach(([resource, amount]) => {
-        const resourceName = resource as ResourceName;
-
-        if (updatedResources[resourceName]) {
-          updatedResources[resourceName].quantity -= amount.count;
-        }
-      });
-
-      return {
-        ...current,
-        player: {
-          ...current.player,
-          resources: updatedResources,
-        },
-      };
-    });
-  }
-  /**
-   * Purchase logic.
-   * @param buildingName - The name of the building.
-   * @param requiredCost - Cost of the building.
-   * @param incrementBuildingFn - increments building quantity.
-   */
-  private purchaseBuilding(
-    buildingName: BuildingName,
-    requiredCost: BuildingCost,
-    incrementBuildingFn: (current: GameState) => number
-  ): void {
-    this.deductResource(requiredCost);
-
-    let newCost = this.calculateBuildingCost(buildingName, true);
-
-    this.gameStateSignal.update((current: GameState) => ({
-      ...current,
-      player: {
-        ...current.player,
-        buildings: {
-          ...current.player.buildings,
-          [buildingName]: {
-            ...current.player.buildings[buildingName],
-            quantity: incrementBuildingFn(current),
-            cost: newCost,
-          },
-        },
-      },
-    }));
   }
 
   /**
@@ -174,12 +29,168 @@ export class BuildingService {
     const currentCost =
       this.gameStateSignal().player.buildings[buildingName].cost;
 
-    if (this.canAfford(currentCost)) {
-      this.purchaseBuilding(
+    if (this.buildingManager.canAfford(currentCost)) {
+      this.buildingManager.purchaseBuilding(
         buildingName,
-        this.calculateBuildingCost(buildingName),
+        this.costCalculator.calculateBuildingCost(buildingName),
         (current) => current.player.buildings[buildingName].quantity + 1
       );
     }
+  }
+
+  /**
+   * game loop update
+   */
+  public updateBuildingsLoop(): void {
+    const buildings = this.gameStateSignal().player.buildings;
+
+    const productionRates: { [resource in ResourceName]?: number } = {};
+
+    let totalCoalUsage = 0;
+
+    Object.keys(this.gameStateSignal().player.resources).forEach(
+      (resourceName) => {
+        productionRates[resourceName as ResourceName] = 0;
+      }
+    );
+
+    Object.keys(buildings).forEach((buildingName) => {
+      const building = buildings[buildingName as BuildingName];
+
+      building.assignments.forEach((assignment) => {
+        if (assignment.status === STATUS.active && assignment.job) {
+          if (building.fuelUsage !== undefined) {
+            totalCoalUsage += building.fuelUsage;
+          }
+        }
+      });
+    });
+
+    if (totalCoalUsage > 0) {
+      productionRates.coal = (productionRates.coal || 0) - totalCoalUsage;
+      this.deactivateBuildingsIfNeeded(totalCoalUsage);
+    }
+
+    Object.keys(buildings).forEach((buildingName) => {
+      const building = buildings[buildingName as BuildingName];
+
+      building.assignments.forEach((assignment) => {
+        if (assignment.status === STATUS.active && assignment.job) {
+          const resource: ResourceName = assignment.job as ResourceName;
+
+          productionRates[resource] = (productionRates[resource] || 0) + 1;
+        }
+      });
+    });
+
+    this.updateResourceProductionRates(productionRates);
+  }
+
+  /**
+   * Updates resource production rates
+   */
+  private updateResourceProductionRates(productionRates: {
+    [resource in ResourceName]?: number;
+  }) {
+    const resourceUpdates: Partial<Record<ResourceName, Partial<Resource>>> =
+      {};
+
+    Object.keys(productionRates).forEach((resourceName) => {
+      resourceUpdates[resourceName as ResourceName] = {
+        productionRate: productionRates[resourceName as ResourceName],
+      };
+    });
+
+    this.gameStateService.updateResources(resourceUpdates);
+  }
+
+  /**
+   * deactivates buildings when coal usage would shortage capacity
+   * @param requiredCoalUsage count of negative coal usage
+   */
+  private deactivateBuildingsIfNeeded(requiredCoalUsage: number): void {
+    const coalResource = this.gameStateSignal().player.resources.coal;
+
+    if (coalResource.quantity < requiredCoalUsage) {
+      const buildings = Object.values(this.gameStateSignal().player.buildings);
+
+      const priorityOrder = [
+        'labs',
+        'assemblers',
+        'furnaces',
+        'drills',
+      ] as BuildingName[];
+
+      for (let priority of priorityOrder) {
+        const buildingsOfPriority = buildings.filter(
+          (building) => building.name === priority
+        );
+
+        buildingsOfPriority.sort((a, b) => a.id - b.id);
+
+        for (let building of buildingsOfPriority) {
+          for (let assignment of building.assignments) {
+            if (coalResource.quantity >= requiredCoalUsage) break;
+            if (
+              assignment.status === STATUS.active &&
+              assignment.job !== 'coal'
+            ) {
+              assignment.status = STATUS.inactive;
+              requiredCoalUsage -= building.fuelUsage;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   * handles assigments of drills, player can increment or decrement drill assignment to resource
+   * @todo could be generalized for every building
+   * @param isDrillIncrement if true increment, if false decrement
+   * @param resourceName resource name
+   */
+  public handleDrillAssignment(
+    isDrillIncrement: boolean,
+    resourceName: ResourceName
+  ) {
+    const drills = this.gameStateSignal().player.buildings.drills;
+
+    if (!drills || !drills.assignments) {
+      return;
+    }
+
+    const activeAssignments = drills.assignments.filter(
+      (assignment) =>
+        assignment.job === resourceName && assignment.status === STATUS.active
+    );
+
+    if (isDrillIncrement) {
+      const inactiveAssignment = drills.assignments.find(
+        (assignment) => assignment.status === STATUS.inactive
+      );
+
+      if (inactiveAssignment) {
+        inactiveAssignment.status = STATUS.active;
+        inactiveAssignment.job = resourceName;
+      } else {
+        console.warn('No inactive drills available to assign.');
+      }
+    } else {
+      if (activeAssignments.length > 0) {
+        activeAssignments[0].status = STATUS.inactive;
+        activeAssignments[0].job = undefined;
+      } else {
+        console.warn(
+          `No active drills assigned to ${resourceName} to deactivate.`
+        );
+      }
+    }
+
+    const buildingUpdates: Partial<Building> = {
+      assignments: [...drills.assignments],
+    };
+
+    this.gameStateService.updateSingleBuilding('drills', buildingUpdates);
   }
 }

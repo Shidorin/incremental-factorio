@@ -1,10 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { BuildingName } from 'src/app/interfaces';
-import {
-  Building,
-  BuildingCost,
-} from 'src/app/interfaces/game-state/building.interface';
+import { Building } from 'src/app/interfaces/game-state/building.interface';
+import { BuildingName } from 'src/app/enums';
 
 @Component({
   selector: 'app-building-item',

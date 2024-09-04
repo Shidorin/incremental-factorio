@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Resource, ResourceName } from 'src/app/interfaces';
+import { handleDrillChange, Resource } from 'src/app/interfaces';
+import { ResourceName } from 'src/app/enums';
 
 @Component({
   selector: 'app-resource-item',
@@ -13,8 +14,17 @@ export class ResourceItemComponent {
   @Input() public resource!: Resource;
   @Input() public resourceName!: ResourceName;
   @Output() public increment = new EventEmitter<ResourceName>();
+  @Output() public handleDrillAssignment =
+    new EventEmitter<handleDrillChange>();
 
   protected handleClick() {
     this.increment.emit(this.resourceName);
+  }
+
+  protected handleDrillChangeButton(isDrillIncrement: boolean) {
+    this.handleDrillAssignment.emit({
+      isDrillIncrement: isDrillIncrement,
+      resourceName: this.resourceName,
+    });
   }
 }

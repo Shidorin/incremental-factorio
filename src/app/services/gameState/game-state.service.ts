@@ -1,5 +1,7 @@
 import { Injectable, signal, WritableSignal } from '@angular/core';
-import { GameState } from '../../interfaces';
+import { GameState, Resource } from '../../interfaces';
+import { BuildingName, ResourceName, STATUS } from 'src/app/enums';
+import { Building } from 'src/app/interfaces/game-state/building.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -8,8 +10,8 @@ export class GameStateService {
   private initialGameState: GameState = {
     player: {
       resources: {
-        stone: { name: 'stone', quantity: 0, productionRate: 0, capacity: 10 },
-        coal: { name: 'coal', quantity: 0, productionRate: 0, capacity: 10 },
+        stone: { name: 'stone', quantity: 5, productionRate: 0, capacity: 20 },
+        coal: { name: 'coal', quantity: 5, productionRate: 0, capacity: 20 },
         // copper: { name: 'copper', quantity: 0, productionRate: 0 },
         // iron: { name: 'iron', quantity: 0, productionRate: 0 },
         // oil: { name: 'oil', quantity: 0, productionRate: 0 },
@@ -31,25 +33,33 @@ export class GameStateService {
         drills: {
           name: 'drills',
           quantity: 0,
+          fuelUsage: 0.5,
           cost: {
             stone: { count: 5, baseCost: 5, scalingFactor: 1.6 },
             coal: { count: 5, baseCost: 5, scalingFactor: 1.6 },
           },
+          assignments: [],
         },
         furnaces: {
           name: 'furnaces',
           quantity: 0,
+          fuelUsage: 1,
           cost: { stone: { count: 5, baseCost: 5, scalingFactor: 1.6 } },
+          assignments: [],
         },
         assemblers: {
           name: 'assemblers',
           quantity: 0,
-          cost: { stone: { count: 5, baseCost: 5, scalingFactor: 1.6 } },
+          fuelUsage: 2,
+          cost: { coal: { count: 5, baseCost: 5, scalingFactor: 1.6 } },
+          assignments: [],
         },
         labs: {
           name: 'labs',
           quantity: 0,
+          fuelUsage: 5,
           cost: { stone: { count: 5, baseCost: 5, scalingFactor: 1.6 } },
+          assignments: [],
         },
       },
       upgrades: {
@@ -64,7 +74,7 @@ export class GameStateService {
         currentTier: 'red',
         restartCount: 0,
         perks: {
-          // Add more perks
+          // add more perks
         },
       },
     },
@@ -75,15 +85,87 @@ export class GameStateService {
       notificationsOn: true,
     },
     uiState: {
-      currentScreen: 'main', // Tracks which screen the player is on (main, settings, science tree, etc.)
-      popupsSeen: [], // Array of seen tutorial popups
-      resourcePanelExpanded: true, // UI state for toggling resource panel
+      currentScreen: 'main',
+      popupsSeen: [],
+      resourcePanelExpanded: true,
     },
   };
 
   private gameStateSignal = signal(this.initialGameState);
 
+  /**
+   * returns game state signal
+   */
   public getSignal(): WritableSignal<GameState> {
     return this.gameStateSignal;
+  }
+
+  /**
+   * Update specific resources in the game state.
+   * @param resourceUpdates - An object containing the resource names and their new values.
+   */
+  public updateResources(
+    resourceUpdates: Partial<Record<ResourceName, Partial<Resource>>>
+  ): void {
+    this.gameStateSignal.update((current: GameState) => {
+      const updatedResources = { ...current.player.resources };
+
+      Object.entries(resourceUpdates).forEach(([resourceName, updates]) => {
+        updatedResources[resourceName as ResourceName] = {
+          ...updatedResources[resourceName as ResourceName],
+          ...updates,
+        };
+      });
+
+      return {
+        ...current,
+        player: {
+          ...current.player,
+          resources: updatedResources,
+        },
+      };
+    });
+  }
+
+  public updateSingleBuilding(
+    buildingName: BuildingName,
+    updates: Partial<Building>
+  ): void {
+    this.gameStateSignal.update((current: GameState) => ({
+      ...current,
+      player: {
+        ...current.player,
+        buildings: {
+          ...current.player.buildings,
+          [buildingName]: {
+            ...current.player.buildings[buildingName],
+            ...updates,
+          },
+        },
+      },
+    }));
+  }
+
+  public updateBuildings(
+    buildingUpdates: Partial<Record<BuildingName, Partial<Building>>>
+  ): void {
+    this.gameStateSignal.update((current: GameState) => {
+      const updatedBuildings = { ...current.player.buildings };
+
+      Object.entries(buildingUpdates).forEach(([buildingName, updates]) => {
+        updatedBuildings[buildingName as BuildingName] = {
+          ...updatedBuildings[buildingName as BuildingName],
+          ...updates,
+        };
+      });
+
+      return {
+        ...current,
+        player: {
+          ...current.player,
+          buildings: updatedBuildings,
+        },
+      };
+    });
   }
 }

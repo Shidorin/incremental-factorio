@@ -7,5 +7,3 @@ export interface BuildingTypes {
   labs: Building;
 }
 
-export type BuildingName = 'drills' | 'furnaces' | 'assemblers' | 'labs';
-
