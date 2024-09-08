@@ -1,7 +1,7 @@
 import { inject, Injectable, WritableSignal } from '@angular/core';
 import { GameState } from 'src/app/interfaces';
 import { GameStateService } from './game-state.service';
-import { ResourceName } from 'src/app/enums';
+import { ResourceName } from 'src/app/constants/types';
 
 @Injectable({
   providedIn: 'root',

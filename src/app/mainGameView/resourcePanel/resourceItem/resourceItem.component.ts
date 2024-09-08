@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { handleDrillChange, Resource } from 'src/app/interfaces';
-import { ResourceName } from 'src/app/enums';
+import { ResourceName } from 'src/app/constants/types';
 
 @Component({
   selector: 'app-resource-item',

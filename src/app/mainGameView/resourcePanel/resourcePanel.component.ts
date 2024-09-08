@@ -7,7 +7,9 @@ import {
   GameStateService,
   ResourceService,
 } from 'src/app/services/gameState';
-import { ResourceName } from 'src/app/enums';
+import { ResourceName } from 'src/app/constants/types';
+import { GameProgressService } from 'src/app/services/gameProgress';
+import { CATEGORIES } from 'src/app/constants/enums';
 
 @Component({
   selector: 'app-resource-panel',
@@ -21,8 +23,9 @@ export class ResourcePanelComponent {
   public resourceService: ResourceService;
   public buildingService: BuildingService;
   public signal: WritableSignal<GameState>;
+  public categories = CATEGORIES;
 
-  public constructor() {
+  public constructor(protected gameProgressService: GameProgressService) {
     this.gameStateService = inject(GameStateService);
     this.resourceService = inject(ResourceService);
     this.buildingService = inject(BuildingService);

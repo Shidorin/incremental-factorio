@@ -1,11 +1,12 @@
 import { Injectable, WritableSignal } from '@angular/core';
 import { Building, GameState, Resource } from 'src/app/interfaces';
 import { GameStateService } from './game-state.service';
-import { BuildingName, ResourceName, STATUS } from 'src/app/enums';
+import { BuildingName, ResourceName, STATUS } from 'src/app/constants/types';
 import {
   BuildingCostCalculatorService,
   BuildingManagerService,
 } from './building/index';
+import { BUILDINGS, RESOURCES } from 'src/app/constants/enums';
 
 @Injectable({
   providedIn: 'root',
@@ -58,7 +59,7 @@ export class BuildingService {
       const building = buildings[buildingName as BuildingName];
 
       building.assignments.forEach((assignment) => {
-        if (assignment.status === STATUS.active && assignment.job) {
+        if (assignment.status === STATUS.ACTIVE && assignment.job) {
           if (building.fuelUsage !== undefined) {
             totalCoalUsage += building.fuelUsage;
           }
@@ -75,7 +76,7 @@ export class BuildingService {
       const building = buildings[buildingName as BuildingName];
 
       building.assignments.forEach((assignment) => {
-        if (assignment.status === STATUS.active && assignment.job) {
+        if (assignment.status === STATUS.ACTIVE && assignment.job) {
           const resource: ResourceName = assignment.job as ResourceName;
 
           productionRates[resource] = (productionRates[resource] || 0) + 1;
@@ -115,10 +116,10 @@ export class BuildingService {
       const buildings = Object.values(this.gameStateSignal().player.buildings);
 
       const priorityOrder = [
-        'labs',
-        'assemblers',
-        'furnaces',
-        'drills',
+        BUILDINGS.LABS,
+        BUILDINGS.ASSEMBLERS,
+        BUILDINGS.FURNACES,
+        BUILDINGS.DRILLS,
       ] as BuildingName[];
 
       for (let priority of priorityOrder) {
@@ -132,10 +133,10 @@ export class BuildingService {
           for (let assignment of building.assignments) {
             if (coalResource.quantity >= requiredCoalUsage) break;
             if (
-              assignment.status === STATUS.active &&
-              assignment.job !== 'coal'
+              assignment.status === STATUS.ACTIVE &&
+              assignment.job !== RESOURCES.COAL
             ) {
-              assignment.status = STATUS.inactive;
+              assignment.status = STATUS.INACTIVE;
               requiredCoalUsage -= building.fuelUsage;
             }
           }
@@ -162,23 +163,23 @@ export class BuildingService {
 
     const activeAssignments = drills.assignments.filter(
       (assignment) =>
-        assignment.job === resourceName && assignment.status === STATUS.active
+        assignment.job === resourceName && assignment.status === STATUS.ACTIVE
     );
 
     if (isDrillIncrement) {
       const inactiveAssignment = drills.assignments.find(
-        (assignment) => assignment.status === STATUS.inactive
+        (assignment) => assignment.status === STATUS.INACTIVE
       );
 
       if (inactiveAssignment) {
-        inactiveAssignment.status = STATUS.active;
+        inactiveAssignment.status = STATUS.ACTIVE;
         inactiveAssignment.job = resourceName;
       } else {
         console.warn('No inactive drills available to assign.');
       }
     } else {
       if (activeAssignments.length > 0) {
-        activeAssignments[0].status = STATUS.inactive;
+        activeAssignments[0].status = STATUS.INACTIVE;
         activeAssignments[0].job = undefined;
       } else {
         console.warn(
@@ -191,6 +192,9 @@ export class BuildingService {
       assignments: [...drills.assignments],
     };
 
-    this.gameStateService.updateSingleBuilding('drills', buildingUpdates);
+    this.gameStateService.updateSingleBuilding(
+      BUILDINGS.DRILLS,
+      buildingUpdates
+    );
   }
 }

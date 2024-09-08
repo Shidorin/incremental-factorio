@@ -1,5 +1,10 @@
 import { Injectable, WritableSignal } from '@angular/core';
-import { BuildingCost, BuildingName, ResourceName, STATUS } from 'src/app/enums';
+import {
+  BuildingCost,
+  BuildingName,
+  ResourceName,
+  STATUS,
+} from 'src/app/constants/types';
 import { Resource, GameState, Building } from 'src/app/interfaces';
 import { GameStateService } from '../game-state.service';
 import { BuildingCostCalculatorService } from './index';
@@ -75,7 +80,7 @@ export class BuildingManagerService {
       cost: newCost,
       assignments: [
         ...currentBuilding.assignments,
-        { status: STATUS.inactive },
+        { status: STATUS.INACTIVE },
       ],
     };
 

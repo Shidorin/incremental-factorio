@@ -1,0 +1,56 @@
+import { Injectable, WritableSignal } from '@angular/core';
+import { GameStateService } from '../gameState';
+import { GameState, ProgressState } from 'src/app/interfaces';
+import { BUILDINGS, CATEGORIES } from 'src/app/constants/enums';
+
+@Injectable({
+  providedIn: 'root',
+})
+export class GameProgressService {
+  private gameState: WritableSignal<GameState>;
+
+  constructor(private gameStateService: GameStateService) {
+    this.gameState = this.gameStateService.getSignal();
+  }
+
+  /**
+   * Checks if an item is unlocked in a specific category.
+   * @param category - The category of the item.
+   * @param itemName - The name of the item.
+   * @returns True if the item is unlocked, false otherwise.
+   */
+  public isItemUnlocked<T extends keyof ProgressState['unlockedItems']>(
+    category: T,
+    itemName: ProgressState['unlockedItems'][T][number]
+  ): boolean {
+    const items = this.gameState().progressState.unlockedItems[category];
+    return (items as Array<typeof itemName>).includes(itemName);
+  }
+
+  /**
+   * Unlocks item in a specific category.
+   * @param category - The category of the item.
+   * @param itemName - The name of the item.
+   */
+  public unlockItem<T extends keyof ProgressState['unlockedItems']>(
+    category: T,
+    itemName: ProgressState['unlockedItems'][T][number]
+  ): void {
+    const items = this.gameState().progressState.unlockedItems[category];
+    if (Array.isArray(items)) {
+      (items as Array<typeof itemName>).push(itemName);
+    }
+  }
+
+  /**
+   * Progress loop for unlocking new things.
+   */
+  public updateProgress(): void {
+    if (
+      !this.isItemUnlocked(CATEGORIES.BUILDINGS, BUILDINGS.FURNACES) &&
+      this.gameState().player.buildings.drills.quantity > 0
+    ) {
+      this.unlockItem(CATEGORIES.BUILDINGS, BUILDINGS.FURNACES);
+    }
+  }
+}

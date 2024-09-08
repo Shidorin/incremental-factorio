@@ -1,4 +1,4 @@
-import { ResourceName } from 'src/app/enums';
+import { ResourceName } from 'src/app/constants/types';
 
 export interface Resource {
   name: string;

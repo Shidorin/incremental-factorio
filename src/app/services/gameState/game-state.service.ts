@@ -1,7 +1,8 @@
 import { Injectable, signal, WritableSignal } from '@angular/core';
 import { GameState, Resource } from '../../interfaces';
-import { BuildingName, ResourceName, STATUS } from 'src/app/enums';
+import { BuildingName, ResourceName, STATUS } from 'src/app/constants/types';
 import { Building } from 'src/app/interfaces/game-state/building.interface';
+import { BUILDINGS, RESOURCES } from 'src/app/constants/enums';
 
 @Injectable({
   providedIn: 'root',
@@ -10,8 +11,18 @@ export class GameStateService {
   private initialGameState: GameState = {
     player: {
       resources: {
-        stone: { name: 'stone', quantity: 5, productionRate: 0, capacity: 20 },
-        coal: { name: 'coal', quantity: 5, productionRate: 0, capacity: 20 },
+        stone: {
+          name: RESOURCES.STONE,
+          quantity: 5,
+          productionRate: 0,
+          capacity: 20,
+        },
+        coal: {
+          name: RESOURCES.COAL,
+          quantity: 5,
+          productionRate: 0,
+          capacity: 20,
+        },
         // copper: { name: 'copper', quantity: 0, productionRate: 0 },
         // iron: { name: 'iron', quantity: 0, productionRate: 0 },
         // oil: { name: 'oil', quantity: 0, productionRate: 0 },
@@ -31,7 +42,7 @@ export class GameStateService {
       },
       buildings: {
         drills: {
-          name: 'drills',
+          name: BUILDINGS.DRILLS,
           quantity: 0,
           fuelUsage: 0.5,
           cost: {
@@ -41,21 +52,21 @@ export class GameStateService {
           assignments: [],
         },
         furnaces: {
-          name: 'furnaces',
+          name: BUILDINGS.FURNACES,
           quantity: 0,
           fuelUsage: 1,
           cost: { stone: { count: 5, baseCost: 5, scalingFactor: 1.6 } },
           assignments: [],
         },
         assemblers: {
-          name: 'assemblers',
+          name: BUILDINGS.ASSEMBLERS,
           quantity: 0,
           fuelUsage: 2,
           cost: { coal: { count: 5, baseCost: 5, scalingFactor: 1.6 } },
           assignments: [],
         },
         labs: {
-          name: 'labs',
+          name: BUILDINGS.LABS,
           quantity: 0,
           fuelUsage: 5,
           cost: { stone: { count: 5, baseCost: 5, scalingFactor: 1.6 } },
@@ -88,6 +99,14 @@ export class GameStateService {
       currentScreen: 'main',
       popupsSeen: [],
       resourcePanelExpanded: true,
+    },
+    progressState: {
+      unlockedItems: {
+        resources: [RESOURCES.COAL, RESOURCES.STONE],
+        buildings: [BUILDINGS.DRILLS],
+        products: [],
+        features: [],
+      },
     },
   };
 
