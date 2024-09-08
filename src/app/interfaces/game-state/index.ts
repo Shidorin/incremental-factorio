@@ -8,3 +8,4 @@ export * from './progression.interface';
 export * from './perks.interface';
 export * from './resource.interface';
 export * from './building.interface';
+export * from './progress-state';

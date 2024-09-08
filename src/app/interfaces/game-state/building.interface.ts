@@ -1,4 +1,4 @@
-import { BuildingCost, ProductName, ResourceName, STATUS } from 'src/app/enums';
+import { BuildingCost, ProductName, ResourceName, STATUS } from 'src/app/constants/types';
 
 export interface Building {
   name: string;

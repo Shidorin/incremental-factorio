@@ -1,8 +1,12 @@
 <p>resourcePanel works!</p>
-<app-resource-item
-  *ngFor="let resource of signal().player.resources | keyvalue"
-  [resourceName]="resource.key"
-  [resource]="resource.value"
-  (increment)="handleChange($event)"
-  (handleDrillAssignment)="handleDrillAssignment($event)"
-></app-resource-item>
+<ng-container *ngFor="let resource of signal().player.resources | keyvalue">
+  <app-resource-item
+    *ngIf="
+      gameProgressService.isItemUnlocked(categories.RESOURCES, resource.key)
+    "
+    [resourceName]="resource.key"
+    [resource]="resource.value"
+    (increment)="handleChange($event)"
+    (handleDrillAssignment)="handleDrillAssignment($event)"
+  ></app-resource-item>
+</ng-container>

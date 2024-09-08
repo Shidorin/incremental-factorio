@@ -1,7 +1,8 @@
 import { Injectable, WritableSignal } from '@angular/core';
-import { BuildingName, ResourceName } from 'src/app/enums';
+import { BuildingName, ResourceName } from 'src/app/constants/types';
 import { BuildingCost, GameState } from 'src/app/interfaces';
 import { GameStateService } from '../game-state.service';
+import { BUILDINGS } from 'src/app/constants/enums';
 
 @Injectable({
   providedIn: 'root',
@@ -80,10 +81,10 @@ export class BuildingCostCalculatorService {
     let result: BuildingCost = {};
 
     switch (buildingName) {
-      case 'drills':
+      case BUILDINGS.DRILLS:
         result = this.calculateDrillCost(buildingName, forNextPurchase);
         break;
-      case 'furnaces':
+      case BUILDINGS.FURNACES:
         result = this.calculateFurnaceCost(buildingName, forNextPurchase);
         break;
       // Add more cases here for other buildings as needed

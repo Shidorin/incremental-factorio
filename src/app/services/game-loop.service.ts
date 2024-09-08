@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { interval, Subscription } from 'rxjs';
 import { BuildingService, ResourceService } from './gameState/index';
+import { GameProgressService } from './gameProgress';
 
 @Injectable({
   providedIn: 'root',
@@ -11,7 +12,8 @@ export class GameLoopService {
 
   constructor(
     private buildingService: BuildingService,
-    private resourceService: ResourceService
+    private resourceService: ResourceService,
+    private gameProgressService: GameProgressService
   ) {}
 
   public startLoop(): void {
@@ -32,5 +34,6 @@ export class GameLoopService {
   private updateGameState(): void {
     this.buildingService.updateBuildingsLoop();
     this.resourceService.updateResourcesLoop();
+    this.gameProgressService.updateProgress();
   }
 }
