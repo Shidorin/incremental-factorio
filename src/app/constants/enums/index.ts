@@ -3,3 +3,4 @@ export * from './resources';
 export * from './buildings';
 export * from './products';
 export * from './categories';
+export * from './metals';

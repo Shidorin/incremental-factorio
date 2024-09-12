@@ -4,6 +4,7 @@ import { ResourcePanelComponent } from './resourcePanel/resourcePanel.component'
 import { BuildingItemComponent } from './buildingsPanel/buildingItem/buildingItem.component';
 import { BuildingsPanelComponent } from './buildingsPanel/buildingsPanel.component';
 import { GameLoopService } from '../services/game-loop.service';
+import { MetalPanelComponent } from './metalPanel/metalPanel.component';
 
 @Component({
   selector: 'app-main-game-view',
@@ -13,6 +14,7 @@ import { GameLoopService } from '../services/game-loop.service';
     ResourcePanelComponent,
     BuildingItemComponent,
     BuildingsPanelComponent,
+    MetalPanelComponent,
   ],
   templateUrl: './mainGameView.component.html',
   styleUrl: './mainGameView.component.scss',

@@ -1,0 +1,9 @@
+<p>metalPanel works!</p>
+<ng-container *ngFor="let metal of metals">
+  <app-metal-item
+    *ngIf="gameProgressService.isItemUnlocked(categories.METALS, metal.key)"
+    [metalName]="metal.key"
+    [metal]="metal.value"
+    (handleFurnaceAssignment)="handleFurnaceAssignment($event)"
+  ></app-metal-item>
+</ng-container>

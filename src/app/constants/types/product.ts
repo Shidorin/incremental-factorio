@@ -1,7 +1,4 @@
 export type ProductName =
-  | 'copperPlate'
-  | 'ironPlate'
-  | 'steel'
   | 'copperCable'
   | 'ironGearWheel'
   | 'greenCircuit'
