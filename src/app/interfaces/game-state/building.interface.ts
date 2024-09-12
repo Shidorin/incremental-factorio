@@ -1,4 +1,10 @@
-import { BuildingCost, ProductName, ResourceName, STATUS } from 'src/app/constants/types';
+import {
+  BuildingCost,
+  ProductName,
+  MetalName,
+  STATUS,
+  ResourceName,
+} from 'src/app/constants/types';
 
 export interface Building {
   name: string;
@@ -10,5 +16,5 @@ export interface Building {
 
 export interface assignment {
   status: STATUS;
-  job?: ResourceName | ProductName;
+  job?: ResourceName | ProductName | MetalName;
 }

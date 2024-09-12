@@ -1,7 +1,13 @@
 import { Injectable, WritableSignal } from '@angular/core';
-import { Building, GameState, Resource } from 'src/app/interfaces';
+import { Building, GameState, Metal, Resource } from 'src/app/interfaces';
 import { GameStateService } from './game-state.service';
-import { BuildingName, ResourceName, STATUS } from 'src/app/constants/types';
+import {
+  BuildingName,
+  MetalName,
+  ProductName,
+  ResourceName,
+  STATUS,
+} from 'src/app/constants/types';
 import {
   BuildingCostCalculatorService,
   BuildingManagerService,
@@ -40,20 +46,12 @@ export class BuildingService {
   }
 
   /**
-   * game loop update
+   * calculates coal usage for active buildings
+   * @returns total coal usage
    */
-  public updateBuildingsLoop(): void {
+  public calculateBuildingsCoalUsage(): number {
     const buildings = this.gameStateSignal().player.buildings;
-
-    const productionRates: { [resource in ResourceName]?: number } = {};
-
     let totalCoalUsage = 0;
-
-    Object.keys(this.gameStateSignal().player.resources).forEach(
-      (resourceName) => {
-        productionRates[resourceName as ResourceName] = 0;
-      }
-    );
 
     Object.keys(buildings).forEach((buildingName) => {
       const building = buildings[buildingName as BuildingName];
@@ -67,8 +65,75 @@ export class BuildingService {
       });
     });
 
+    return totalCoalUsage;
+  }
+
+  /**
+   * checks recipe for active assemblers
+   *  subtracts resources
+   *  updates production rates
+   * @param productionRates for specific metal
+   */
+  private assemblerJob(
+    metalName: MetalName,
+    productionRates: { [metal in MetalName]?: number }
+  ): void {
+    const resources = this.gameStateSignal().player.resources;
+    const metal = this.gameStateSignal().player.metals[metalName];
+
+    for (const recipeItem of metal.recipe) {
+      const availableQuantity = resources[recipeItem.resourceName].quantity;
+
+      if (availableQuantity < recipeItem.count) {
+        // console.warn(`Not enough ${recipeItem.resourceName}. Required: ${recipeItem.count}, available: ${availableQuantity}`);
+        return;
+      }
+    }
+
+    metal.recipe.forEach((recipeItem) => {
+      resources[recipeItem.resourceName].quantity -= recipeItem.count;
+    });
+
+    productionRates[metalName] = (productionRates[metalName] || 0) + 1;
+  }
+
+  /**
+   * game loop update
+   */
+  public updateBuildingsLoop(): void {
+    const buildings = this.gameStateSignal().player.buildings;
+
+    const productionRates: {
+      resources: { [resource in ResourceName]?: number };
+      metals: { [metal in MetalName]?: number };
+      products: { [product in ProductName]?: number };
+    } = {
+      resources: {},
+      metals: {},
+      products: {},
+    };
+
+    Object.keys(this.gameStateSignal().player.resources).forEach(
+      (resourceName) => {
+        productionRates.resources[resourceName as ResourceName] = 0;
+      }
+    );
+
+    Object.keys(this.gameStateSignal().player.metals).forEach((metalName) => {
+      productionRates.metals[metalName as MetalName] = 0;
+    });
+
+    Object.keys(this.gameStateSignal().player.products).forEach(
+      (productName) => {
+        productionRates.products[productName as ProductName] = 0;
+      }
+    );
+
+    let totalCoalUsage = this.calculateBuildingsCoalUsage();
+
     if (totalCoalUsage > 0) {
-      productionRates.coal = (productionRates.coal || 0) - totalCoalUsage;
+      productionRates.resources.coal =
+        (productionRates.resources.coal || 0) - totalCoalUsage;
       this.deactivateBuildingsIfNeeded(totalCoalUsage);
     }
 
@@ -77,32 +142,72 @@ export class BuildingService {
 
       building.assignments.forEach((assignment) => {
         if (assignment.status === STATUS.ACTIVE && assignment.job) {
-          const resource: ResourceName = assignment.job as ResourceName;
+          const job = assignment.job;
 
-          productionRates[resource] = (productionRates[resource] || 0) + 1;
+          if (this.isResourceName(job)) {
+            const resource: ResourceName = job as ResourceName;
+            productionRates.resources[resource] =
+              (productionRates.resources[resource] || 0) + 1;
+          } else if (this.isMetalName(job)) {
+            const metal: MetalName = job as MetalName;
+            this.assemblerJob(metal, productionRates.metals);
+          } else if (this.isProductName(job)) {
+            const product: ProductName = job as ProductName;
+            productionRates.products[product] =
+              (productionRates.products[product] || 0) + 1;
+          }
         }
       });
     });
 
-    this.updateResourceProductionRates(productionRates);
+    this.updateProductionRates(productionRates);
+  }
+
+  private isResourceName(name: string): name is ResourceName {
+    return Object.keys(this.gameStateSignal().player.resources).includes(name);
+  }
+
+  private isMetalName(name: string): name is MetalName {
+    return Object.keys(this.gameStateSignal().player.metals).includes(name);
+  }
+
+  private isProductName(name: string): name is ProductName {
+    return Object.keys(this.gameStateSignal().player.products).includes(name);
   }
 
   /**
    * Updates resource production rates
    */
-  private updateResourceProductionRates(productionRates: {
-    [resource in ResourceName]?: number;
+  private updateProductionRates(productionRates: {
+    resources: { [resource in ResourceName]?: number };
+    metals: { [metal in MetalName]?: number };
+    products: { [product in ProductName]?: number };
   }) {
     const resourceUpdates: Partial<Record<ResourceName, Partial<Resource>>> =
       {};
+    const metalUpdates: Partial<Record<MetalName, Partial<Metal>>> = {};
+    const productUpdates: Partial<Record<ProductName, number>> = {};
 
-    Object.keys(productionRates).forEach((resourceName) => {
+    Object.keys(productionRates.resources).forEach((resourceName) => {
       resourceUpdates[resourceName as ResourceName] = {
-        productionRate: productionRates[resourceName as ResourceName],
+        productionRate: productionRates.resources[resourceName as ResourceName],
       };
     });
 
+    Object.keys(productionRates.metals).forEach((metalName) => {
+      metalUpdates[metalName as MetalName] = {
+        productionRate: productionRates.metals[metalName as MetalName],
+      };
+    });
+
+    Object.keys(productionRates.products).forEach((productName) => {
+      productUpdates[productName as ProductName] =
+        productionRates.products[productName as ProductName];
+    });
+
     this.gameStateService.updateResources(resourceUpdates);
+    this.gameStateService.updateMetals(metalUpdates);
+    // this.gameStateService.updateProducts(productUpdates);
   }
 
   /**
@@ -194,6 +299,53 @@ export class BuildingService {
 
     this.gameStateService.updateSingleBuilding(
       BUILDINGS.DRILLS,
+      buildingUpdates
+    );
+  }
+
+  /**
+   * handles assigments of furnaces, player can increment or decrement drill assignment to resource
+   * @todo could be generalized for every building
+   * @param isFurnaceIncrement if true increment, if false decrement
+   * @param metalName resource name
+   */
+  public handleFurnaceAssignment(
+    isFurnaceIncrement: boolean,
+    metalName: MetalName
+  ) {
+    const furnaces = this.gameStateSignal().player.buildings.furnaces;
+    if (!furnaces || !furnaces.assignments) {
+      return;
+    }
+    const activeAssignments = furnaces.assignments.filter(
+      (assignment) =>
+        assignment.job === metalName && assignment.status === STATUS.ACTIVE
+    );
+    if (isFurnaceIncrement) {
+      const inactiveAssignment = furnaces.assignments.find(
+        (assignment) => assignment.status === STATUS.INACTIVE
+      );
+      if (inactiveAssignment) {
+        inactiveAssignment.status = STATUS.ACTIVE;
+        inactiveAssignment.job = metalName;
+      } else {
+        console.warn('No inactive furnaces available to assign.');
+      }
+    } else {
+      if (activeAssignments.length > 0) {
+        activeAssignments[0].status = STATUS.INACTIVE;
+        activeAssignments[0].job = undefined;
+      } else {
+        console.warn(
+          `No active furnaces assigned to ${metalName} to deactivate.`
+        );
+      }
+    }
+    const buildingUpdates: Partial<Building> = {
+      assignments: [...furnaces.assignments],
+    };
+    this.gameStateService.updateSingleBuilding(
+      BUILDINGS.FURNACES,
       buildingUpdates
     );
   }

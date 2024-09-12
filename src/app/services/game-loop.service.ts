@@ -34,6 +34,7 @@ export class GameLoopService {
   private updateGameState(): void {
     this.buildingService.updateBuildingsLoop();
     this.resourceService.updateResourcesLoop();
+    this.resourceService.updateMetalsLoop();
     this.gameProgressService.updateProgress();
   }
 }

@@ -1,4 +1,4 @@
-import { ResourceName, ProductName } from 'src/app/constants/types';
+import { ProductName, ResourceName } from 'src/app/constants/types';
 
 export type Products = {
   [productName in ProductName]: number;

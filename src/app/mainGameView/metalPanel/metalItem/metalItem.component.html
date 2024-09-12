@@ -1,0 +1,9 @@
+<div class="metal-bar">
+  <div (click)="handleClick()">
+    <p>name: {{ metalName }}</p>
+    <p>quantity: {{ metal.quantity }}</p>
+    <p>productionRate: {{ metal.productionRate }}</p>
+  </div>
+  <button (click)="handleFurnaceChangeButton(true)">+</button>
+  <button (click)="handleFurnaceChangeButton(false)">-</button>
+</div>

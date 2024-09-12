@@ -1,7 +1,12 @@
 import { Injectable, WritableSignal } from '@angular/core';
 import { GameStateService } from '../gameState';
 import { GameState, ProgressState } from 'src/app/interfaces';
-import { BUILDINGS, CATEGORIES } from 'src/app/constants/enums';
+import {
+  BUILDINGS,
+  CATEGORIES,
+  METALS,
+  RESOURCES,
+} from 'src/app/constants/enums';
 
 @Injectable({
   providedIn: 'root',
@@ -46,11 +51,30 @@ export class GameProgressService {
    * Progress loop for unlocking new things.
    */
   public updateProgress(): void {
+    //UNLOCK FURNACE
     if (
       !this.isItemUnlocked(CATEGORIES.BUILDINGS, BUILDINGS.FURNACES) &&
       this.gameState().player.buildings.drills.quantity > 0
     ) {
       this.unlockItem(CATEGORIES.BUILDINGS, BUILDINGS.FURNACES);
+    }
+    // UNLOCK COPPER AND IRON
+    if (
+      !this.isItemUnlocked(CATEGORIES.RESOURCES, RESOURCES.COPPER) &&
+      this.gameState().player.buildings.furnaces.quantity > 0
+    ) {
+      this.unlockItem(CATEGORIES.RESOURCES, RESOURCES.COPPER);
+      this.unlockItem(CATEGORIES.RESOURCES, RESOURCES.IRON);
+    }
+
+    // UNLOCK METALS
+    if (
+      !this.isItemUnlocked(CATEGORIES.METALS, METALS.COPPER_PLATE) &&
+      this.gameState().player.resources.copper.quantity > 0 &&
+      this.gameState().player.resources.iron.quantity > 0
+    ) {
+      this.unlockItem(CATEGORIES.METALS, METALS.COPPER_PLATE);
+      this.unlockItem(CATEGORIES.METALS, METALS.IRON_PLATE);
     }
   }
 }

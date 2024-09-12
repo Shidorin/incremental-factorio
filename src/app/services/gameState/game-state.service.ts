@@ -1,6 +1,11 @@
 import { Injectable, signal, WritableSignal } from '@angular/core';
-import { GameState, Resource } from '../../interfaces';
-import { BuildingName, ResourceName, STATUS } from 'src/app/constants/types';
+import { GameState, Metal, Resource } from '../../interfaces';
+import {
+  BuildingName,
+  MetalName,
+  ResourceName,
+  STATUS,
+} from 'src/app/constants/types';
 import { Building } from 'src/app/interfaces/game-state/building.interface';
 import { BUILDINGS, RESOURCES } from 'src/app/constants/enums';
 
@@ -13,25 +18,51 @@ export class GameStateService {
       resources: {
         stone: {
           name: RESOURCES.STONE,
-          quantity: 5,
+          quantity: 15,
           productionRate: 0,
           capacity: 20,
         },
         coal: {
           name: RESOURCES.COAL,
-          quantity: 5,
+          quantity: 15,
           productionRate: 0,
           capacity: 20,
+        },
+        copper: {
+          name: RESOURCES.COPPER,
+          quantity: 10,
+          productionRate: 0,
+          capacity: 10,
+        },
+        iron: {
+          name: RESOURCES.IRON,
+          quantity: 10,
+          productionRate: 0,
+          capacity: 10,
         },
         // copper: { name: 'copper', quantity: 0, productionRate: 0 },
         // iron: { name: 'iron', quantity: 0, productionRate: 0 },
         // oil: { name: 'oil', quantity: 0, productionRate: 0 },
         // uran: { name: 'uran', quantity: 0, productionRate: 0 },
       },
+      metals: {
+        copperPlate: {
+          quantity: 0,
+          productionRate: 0,
+          recipe: [{ resourceName: RESOURCES.COPPER, count: 1 }],
+        },
+        ironPlate: {
+          quantity: 0,
+          productionRate: 0,
+          recipe: [{ resourceName: RESOURCES.IRON, count: 1 }],
+        },
+        steel: {
+          quantity: 0,
+          productionRate: 0,
+          recipe: [{ resourceName: RESOURCES.IRON, count: 2 }],
+        },
+      },
       products: {
-        copperPlate: 0,
-        ironPlate: 0,
-        steel: 0,
         copperCable: 0,
         ironGearWheel: 0,
         greenCircuit: 0,
@@ -104,6 +135,7 @@ export class GameStateService {
       unlockedItems: {
         resources: [RESOURCES.COAL, RESOURCES.STONE],
         buildings: [BUILDINGS.DRILLS],
+        metals: ['steel'],
         products: [],
         features: [],
       },
@@ -141,6 +173,33 @@ export class GameStateService {
         player: {
           ...current.player,
           resources: updatedResources,
+        },
+      };
+    });
+  }
+
+  /**
+   * Update specific metals in the game state.
+   * @param metalUpdates - An object containing the resource names and their new values.
+   */
+  public updateMetals(
+    metalUpdates: Partial<Record<MetalName, Partial<Metal>>>
+  ): void {
+    this.gameStateSignal.update((current: GameState) => {
+      const updatedMetals = { ...current.player.metals };
+
+      Object.entries(metalUpdates).forEach(([metalName, updates]) => {
+        updatedMetals[metalName as MetalName] = {
+          ...updatedMetals[metalName as MetalName],
+          ...updates,
+        };
+      });
+
+      return {
+        ...current,
+        player: {
+          ...current.player,
+          metals: updatedMetals,
         },
       };
     });
