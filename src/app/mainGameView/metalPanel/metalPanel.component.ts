@@ -35,14 +35,14 @@ export class MetalPanelComponent {
     this.metals = Object.entries(this.signal().player.metals).map(
       ([key, value]) => {
         return { key: key as MetalName, value };
-      }
+      },
     );
   }
 
   public handleFurnaceAssignment(payload: handleFurnaceChange) {
     this.buildingService.handleFurnaceAssignment(
       payload.isFurnaceIncrement,
-      payload.metalName
+      payload.metalName,
     );
   }
 }

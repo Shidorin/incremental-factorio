@@ -13,7 +13,7 @@ export class GameLoopService {
   constructor(
     private buildingService: BuildingService,
     private resourceService: ResourceService,
-    private gameProgressService: GameProgressService
+    private gameProgressService: GameProgressService,
   ) {}
 
   public startLoop(): void {

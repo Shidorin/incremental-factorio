@@ -1,7 +1,4 @@
-import { GameSettings } from './game-settings.interface';
-import { Player } from './player.interface';
-import { ProgressState } from './progress-state';
-import { UIState } from './ui-state.interface';
+import { GameSettings, Player, ProgressState, UIState } from './';
 
 export interface GameState {
   player: Player;

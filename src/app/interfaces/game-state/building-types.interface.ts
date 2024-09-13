@@ -1,4 +1,4 @@
-import { Building } from './building.interface';
+import { Building } from './';
 
 export interface BuildingTypes {
   drills: Building;
@@ -6,4 +6,3 @@ export interface BuildingTypes {
   assemblers: Building;
   labs: Building;
 }
-

@@ -1,4 +1,4 @@
-import { Perks } from './perks.interface';
+import { Perks } from './';
 
 export interface Progression {
   redSciencePoints: number;
