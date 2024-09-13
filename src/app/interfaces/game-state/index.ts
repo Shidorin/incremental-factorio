@@ -10,3 +10,5 @@ export * from './resource.interface';
 export * from './building.interface';
 export * from './progress-state';
 export * from './metals.interface';
+export * from './game-settings.interface';
+export * from './ui-state.interface';

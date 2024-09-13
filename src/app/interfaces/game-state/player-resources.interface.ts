@@ -1,4 +1,4 @@
-import { Resource } from './resource.interface';
+import { Resource } from './';
 
 export interface PlayerResources {
   coal: Resource;

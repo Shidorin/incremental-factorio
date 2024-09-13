@@ -22,18 +22,18 @@ export class BuildingCostCalculatorService {
    */
   private calculateDrillCost(
     buildingName: BuildingName,
-    forNextPurchase: boolean = false
+    forNextPurchase = false,
   ): BuildingCost {
-    let result: BuildingCost = {};
-    let building = this.gameStateSignal().player.buildings[buildingName];
-    let quantity = building.quantity + (forNextPurchase ? 1 : 0);
+    const result: BuildingCost = {};
+    const building = this.gameStateSignal().player.buildings[buildingName];
+    const quantity = building.quantity + (forNextPurchase ? 1 : 0);
 
     Object.entries(building.cost).forEach(([key, value]) => {
       const resourceKey = key as ResourceName;
       result[resourceKey] = {
         ...value,
         count: Math.ceil(
-          value.baseCost * Math.pow(value.scalingFactor, quantity)
+          value.baseCost * Math.pow(value.scalingFactor, quantity),
         ),
       };
     });
@@ -49,18 +49,18 @@ export class BuildingCostCalculatorService {
    */
   private calculateFurnaceCost(
     buildingName: BuildingName,
-    forNextPurchase: boolean = false
+    forNextPurchase = false,
   ): BuildingCost {
-    let result: BuildingCost = {};
-    let building = this.gameStateSignal().player.buildings[buildingName];
-    let quantity = building.quantity + (forNextPurchase ? 1 : 0);
+    const result: BuildingCost = {};
+    const building = this.gameStateSignal().player.buildings[buildingName];
+    const quantity = building.quantity + (forNextPurchase ? 1 : 0);
 
     Object.entries(building.cost).forEach(([key, value]) => {
       const resourceKey = key as ResourceName;
       result[resourceKey] = {
         ...value,
         count: Math.ceil(
-          value.baseCost * Math.pow(value.scalingFactor, quantity)
+          value.baseCost * Math.pow(value.scalingFactor, quantity),
         ),
       };
     });
@@ -76,7 +76,7 @@ export class BuildingCostCalculatorService {
    */
   public calculateBuildingCost(
     buildingName: BuildingName,
-    forNextPurchase: boolean = false
+    forNextPurchase = false,
   ): BuildingCost {
     let result: BuildingCost = {};
 
@@ -87,7 +87,13 @@ export class BuildingCostCalculatorService {
       case BUILDINGS.FURNACES:
         result = this.calculateFurnaceCost(buildingName, forNextPurchase);
         break;
-      // Add more cases here for other buildings as needed
+      case BUILDINGS.ASSEMBLERS:
+        //general function before math
+        result = this.calculateFurnaceCost(buildingName, forNextPurchase);
+        break;
+      case BUILDINGS.LABS:
+        // result = this.calculateFurnaceCost(buildingName, forNextPurchase);
+        break;
       default:
         break;
     }

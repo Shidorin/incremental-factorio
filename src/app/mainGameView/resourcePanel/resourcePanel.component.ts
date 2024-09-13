@@ -39,7 +39,7 @@ export class ResourcePanelComponent {
   public handleDrillAssignment(payload: handleDrillChange) {
     this.buildingService.handleDrillAssignment(
       payload.isDrillIncrement,
-      payload.resourceName
+      payload.resourceName,
     );
   }
 }

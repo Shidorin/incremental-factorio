@@ -1,7 +1,7 @@
-import { inject, Injectable, WritableSignal } from '@angular/core';
+import { Injectable, WritableSignal } from '@angular/core';
 import { GameState } from 'src/app/interfaces';
 import { GameStateService } from './game-state.service';
-import { MetalName, ResourceName } from 'src/app/constants/types';
+import { MetalName, ProductName, ResourceName } from 'src/app/constants/types';
 
 @Injectable({
   providedIn: 'root',
@@ -65,5 +65,17 @@ export class ResourceService {
     });
 
     this.gameStateService.updateMetals(metals);
+  }
+
+  public isResource(name: string): name is ResourceName {
+    return Object.keys(this.gameStateSignal().player.resources).includes(name);
+  }
+
+  public isMetal(name: string): name is MetalName {
+    return Object.keys(this.gameStateSignal().player.metals).includes(name);
+  }
+
+  public isProduct(name: string): name is ProductName {
+    return Object.keys(this.gameStateSignal().player.products).includes(name);
   }
 }

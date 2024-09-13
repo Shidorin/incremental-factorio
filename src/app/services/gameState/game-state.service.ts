@@ -1,13 +1,8 @@
 import { Injectable, signal, WritableSignal } from '@angular/core';
 import { GameState, Metal, Resource } from '../../interfaces';
-import {
-  BuildingName,
-  MetalName,
-  ResourceName,
-  STATUS,
-} from 'src/app/constants/types';
+import { BuildingName, MetalName, ResourceName } from 'src/app/constants/types';
 import { Building } from 'src/app/interfaces/game-state/building.interface';
-import { BUILDINGS, RESOURCES } from 'src/app/constants/enums';
+import { BUILDINGS, METALS, RESOURCES } from 'src/app/constants/enums';
 
 @Injectable({
   providedIn: 'root',
@@ -40,19 +35,15 @@ export class GameStateService {
           productionRate: 0,
           capacity: 10,
         },
-        // copper: { name: 'copper', quantity: 0, productionRate: 0 },
-        // iron: { name: 'iron', quantity: 0, productionRate: 0 },
-        // oil: { name: 'oil', quantity: 0, productionRate: 0 },
-        // uran: { name: 'uran', quantity: 0, productionRate: 0 },
       },
       metals: {
         copperPlate: {
-          quantity: 0,
+          quantity: 5,
           productionRate: 0,
           recipe: [{ resourceName: RESOURCES.COPPER, count: 1 }],
         },
         ironPlate: {
-          quantity: 0,
+          quantity: 5,
           productionRate: 0,
           recipe: [{ resourceName: RESOURCES.IRON, count: 1 }],
         },
@@ -93,7 +84,18 @@ export class GameStateService {
           name: BUILDINGS.ASSEMBLERS,
           quantity: 0,
           fuelUsage: 2,
-          cost: { coal: { count: 5, baseCost: 5, scalingFactor: 1.6 } },
+          cost: {
+            [METALS.COPPER_PLATE]: {
+              count: 5,
+              baseCost: 5,
+              scalingFactor: 1.6,
+            },
+            [METALS.IRON_PLATE]: {
+              count: 5,
+              baseCost: 5,
+              scalingFactor: 1.6,
+            },
+          },
           assignments: [],
         },
         labs: {
@@ -115,9 +117,7 @@ export class GameStateService {
         redSciencePoints: 0,
         currentTier: 'red',
         restartCount: 0,
-        perks: {
-          // add more perks
-        },
+        perks: {},
       },
     },
     gameSettings: {
@@ -135,7 +135,7 @@ export class GameStateService {
       unlockedItems: {
         resources: [RESOURCES.COAL, RESOURCES.STONE],
         buildings: [BUILDINGS.DRILLS],
-        metals: ['steel'],
+        metals: [],
         products: [],
         features: [],
       },
@@ -156,7 +156,7 @@ export class GameStateService {
    * @param resourceUpdates - An object containing the resource names and their new values.
    */
   public updateResources(
-    resourceUpdates: Partial<Record<ResourceName, Partial<Resource>>>
+    resourceUpdates: Partial<Record<ResourceName, Partial<Resource>>>,
   ): void {
     this.gameStateSignal.update((current: GameState) => {
       const updatedResources = { ...current.player.resources };
@@ -183,7 +183,7 @@ export class GameStateService {
    * @param metalUpdates - An object containing the resource names and their new values.
    */
   public updateMetals(
-    metalUpdates: Partial<Record<MetalName, Partial<Metal>>>
+    metalUpdates: Partial<Record<MetalName, Partial<Metal>>>,
   ): void {
     this.gameStateSignal.update((current: GameState) => {
       const updatedMetals = { ...current.player.metals };
@@ -207,7 +207,7 @@ export class GameStateService {
 
   public updateSingleBuilding(
     buildingName: BuildingName,
-    updates: Partial<Building>
+    updates: Partial<Building>,
   ): void {
     this.gameStateSignal.update((current: GameState) => ({
       ...current,
@@ -225,7 +225,7 @@ export class GameStateService {
   }
 
   public updateBuildings(
-    buildingUpdates: Partial<Record<BuildingName, Partial<Building>>>
+    buildingUpdates: Partial<Record<BuildingName, Partial<Building>>>,
   ): void {
     this.gameStateSignal.update((current: GameState) => {
       const updatedBuildings = { ...current.player.buildings };
