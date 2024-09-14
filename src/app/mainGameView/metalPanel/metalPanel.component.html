@@ -4,6 +4,7 @@
     *ngIf="gameProgressService.isItemUnlocked(categories.METALS, metal.key)"
     [metalName]="metal.key"
     [metal]="metal.value"
+    [assigned]="furnaceAssigned(metal.key)"
     (handleFurnaceAssignment)="handleFurnaceAssignment($event)"
   ></app-metal-item>
 </ng-container>

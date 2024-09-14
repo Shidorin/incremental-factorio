@@ -6,6 +6,7 @@
     "
     [resourceName]="resource.key"
     [resource]="resource.value"
+    [assigned]="drillsAssigned(resource.key)"
     (increment)="handleChange($event)"
     (handleDrillAssignment)="handleDrillAssignment($event)"
   ></app-resource-item>

@@ -1,6 +1,11 @@
 import { Injectable, signal, WritableSignal } from '@angular/core';
-import { GameState, Metal, Resource } from '../../interfaces';
-import { BuildingName, MetalName, ResourceName } from 'src/app/constants/types';
+import { GameState, Metal, Product, Resource } from '../../interfaces';
+import {
+  BuildingName,
+  MetalName,
+  ProductName,
+  ResourceName,
+} from 'src/app/constants/types';
 import { Building } from 'src/app/interfaces/game-state/building.interface';
 import {
   BUILDINGS,
@@ -259,6 +264,33 @@ export class GameStateService {
         player: {
           ...current.player,
           metals: updatedMetals,
+        },
+      };
+    });
+  }
+
+  /**
+   * Update specific metals in the game state.
+   * @param productUpdates - An object containing the resource names and their new values.
+   */
+  public updateProducts(
+    productUpdates: Partial<Record<ProductName, Partial<Product>>>
+  ): void {
+    this.gameStateSignal.update((current: GameState) => {
+      const updatedProducts = { ...current.player.products };
+
+      Object.entries(productUpdates).forEach(([productName, updates]) => {
+        updatedProducts[productName as ProductName] = {
+          ...updatedProducts[productName as ProductName],
+          ...updates,
+        };
+      });
+
+      return {
+        ...current,
+        player: {
+          ...current.player,
+          products: updatedProducts,
         },
       };
     });

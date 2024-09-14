@@ -7,8 +7,19 @@ import {
   ResourceName,
   STATUS,
 } from 'src/app/constants/types';
-import { Resource, GameState, Building, Metal } from 'src/app/interfaces';
-import { GameStateService, ResourceService } from '../';
+import {
+  Resource,
+  GameState,
+  Building,
+  Metal,
+  Product,
+} from 'src/app/interfaces';
+import {
+  GameStateService,
+  MetalService,
+  ProductService,
+  ResourceService,
+} from '../';
 import { BuildingCostCalculatorService } from './';
 
 @Injectable({
@@ -21,6 +32,8 @@ export class BuildingManagerService {
     private gameStateService: GameStateService,
     private costCalculator: BuildingCostCalculatorService,
     private resourceService: ResourceService,
+    private metalService: MetalService,
+    private productService: ProductService
   ) {
     this.gameStateSignal = this.gameStateService.getSignal();
   }
@@ -60,7 +73,7 @@ export class BuildingManagerService {
     const resourceUpdates: Partial<Record<ResourceName, Partial<Resource>>> =
       {};
     const metalUpdates: Partial<Record<MetalName, Partial<Metal>>> = {};
-    // const productUpdates: Partial<Record<ProductName, Partial<Product>>> = {};
+    const productUpdates: Partial<Record<ProductName, Partial<Product>>> = {};
 
     Object.entries(cost).forEach(([itemName, amount]) => {
       if (this.resourceService.isResource(itemName)) {
@@ -69,26 +82,24 @@ export class BuildingManagerService {
             (this.gameStateSignal().player.resources[itemName]?.quantity || 0) -
             amount.count,
         };
-      } else if (this.resourceService.isMetal(itemName)) {
-        console.log('deduct item');
+      } else if (this.metalService.isMetal(itemName)) {
         metalUpdates[itemName] = {
           quantity:
             (this.gameStateSignal().player.metals[itemName]?.quantity || 0) -
             amount.count,
         };
+      } else if (this.productService.isProduct(itemName)) {
+        productUpdates[itemName] = {
+          quantity:
+            (this.gameStateSignal().player.products[itemName]?.quantity || 0) -
+            amount.count,
+        };
       }
-      // else if (this.resourceService.isProduct(itemName)) {
-      //   productUpdates[itemName] = {
-      //     quantity:
-      //       (this.gameStateSignal().player.products[itemName]?.quantity || 0) -
-      //       amount.count,
-      //   };
-      // }
     });
 
     this.gameStateService.updateResources(resourceUpdates);
     this.gameStateService.updateMetals(metalUpdates);
-    // this.gameStateService.updateProducts(productUpdates);
+    this.gameStateService.updateProducts(productUpdates);
   }
 
   /**
@@ -100,13 +111,13 @@ export class BuildingManagerService {
   public purchaseBuilding(
     buildingName: BuildingName,
     requiredCost: BuildingCost,
-    incrementBuildingFn: (current: GameState) => number,
+    incrementBuildingFn: (current: GameState) => number
   ): void {
     this.deductItem(requiredCost);
 
     const newCost = this.costCalculator.calculateBuildingCost(
       buildingName,
-      true,
+      true
     );
 
     const currentBuilding =

@@ -3,6 +3,7 @@
     <p>name: {{ resource.name }}</p>
     <p>quantity: {{ resource.quantity }}/{{ resource.capacity }}</p>
     <p>productionRate: {{ resource.productionRate }}</p>
+    <p>assigned: {{ assigned }}</p>
   </div>
   <button (click)="handleDrillChangeButton(true)">+</button>
   <button (click)="handleDrillChangeButton(false)">-</button>

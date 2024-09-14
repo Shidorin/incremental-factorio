@@ -13,6 +13,7 @@ import { handleFurnaceChange, Metal } from 'src/app/interfaces';
 export class MetalItemComponent {
   @Input() public metal!: Metal;
   @Input() public metalName!: MetalName;
+  @Input() public assigned!: number;
   @Output() public increment = new EventEmitter<MetalName>();
   @Output() public handleFurnaceAssignment =
     new EventEmitter<handleFurnaceChange>();
