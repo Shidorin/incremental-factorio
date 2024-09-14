@@ -32,6 +32,15 @@ export class ResourcePanelComponent {
     this.signal = this.gameStateService.getSignal();
   }
 
+  drillsAssigned(resourceName: ResourceName) {
+    return this.signal().player.buildings.drills.assignments.reduce(
+      (count, { job }) => {
+        return job === resourceName ? count + 1 : count;
+      },
+      0
+    );
+  }
+
   public handleChange(resourceName: ResourceName) {
     this.resourceService.incrementResource(resourceName);
   }
@@ -39,7 +48,7 @@ export class ResourcePanelComponent {
   public handleDrillAssignment(payload: handleDrillChange) {
     this.buildingService.handleDrillAssignment(
       payload.isDrillIncrement,
-      payload.resourceName,
+      payload.resourceName
     );
   }
 }

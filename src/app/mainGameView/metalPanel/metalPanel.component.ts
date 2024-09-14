@@ -31,18 +31,27 @@ export class MetalPanelComponent {
     });
   }
 
+  furnaceAssigned(metalName: MetalName) {
+    return this.signal().player.buildings.furnaces.assignments.reduce(
+      (count, { job }) => {
+        return job === metalName ? count + 1 : count;
+      },
+      0
+    );
+  }
+
   private updateMetals(): void {
     this.metals = Object.entries(this.signal().player.metals).map(
       ([key, value]) => {
         return { key: key as MetalName, value };
-      },
+      }
     );
   }
 
   public handleFurnaceAssignment(payload: handleFurnaceChange) {
     this.buildingService.handleFurnaceAssignment(
       payload.isFurnaceIncrement,
-      payload.metalName,
+      payload.metalName
     );
   }
 }

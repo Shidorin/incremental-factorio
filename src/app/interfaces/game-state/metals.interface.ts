@@ -7,8 +7,9 @@ export type PlayerMetals = {
 export interface Metal {
   quantity: number;
   productionRate: number;
+  producedAmount: number;
   recipe: {
-    resourceName: ResourceName;
+    name: ResourceName;
     count: number;
   }[];
 }

@@ -13,6 +13,7 @@ import { ResourceName } from 'src/app/constants/types';
 export class ResourceItemComponent {
   @Input() public resource!: Resource;
   @Input() public resourceName!: ResourceName;
+  @Input() public assigned!: number;
   @Output() public increment = new EventEmitter<ResourceName>();
   @Output() public handleDrillAssignment =
     new EventEmitter<handleDrillChange>();
