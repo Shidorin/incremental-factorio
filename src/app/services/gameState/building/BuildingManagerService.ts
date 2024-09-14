@@ -33,7 +33,7 @@ export class BuildingManagerService {
     private costCalculator: BuildingCostCalculatorService,
     private resourceService: ResourceService,
     private metalService: MetalService,
-    private productService: ProductService
+    private productService: ProductService,
   ) {
     this.gameStateSignal = this.gameStateService.getSignal();
   }
@@ -46,7 +46,7 @@ export class BuildingManagerService {
   public canAfford(costs: BuildingCost): boolean {
     const resources = this.gameStateSignal().player.resources;
     const metals = this.gameStateSignal().player.metals;
-    // const products = this.gameStateSignal().player.products;
+    const products = this.gameStateSignal().player.products;
 
     return Object.entries(costs).every(([itemName, cost]) => {
       if (itemName in resources) {
@@ -57,9 +57,9 @@ export class BuildingManagerService {
         return metals[itemName as MetalName]?.quantity >= cost.count;
       }
 
-      // if (itemName in products) {
-      //   return products[itemName as ProductName]?.quantity >= cost.count;
-      // }
+      if (itemName in products) {
+        return products[itemName as ProductName]?.quantity >= cost.count;
+      }
 
       return false;
     });
@@ -111,13 +111,13 @@ export class BuildingManagerService {
   public purchaseBuilding(
     buildingName: BuildingName,
     requiredCost: BuildingCost,
-    incrementBuildingFn: (current: GameState) => number
+    incrementBuildingFn: (current: GameState) => number,
   ): void {
     this.deductItem(requiredCost);
 
     const newCost = this.costCalculator.calculateBuildingCost(
       buildingName,
-      true
+      true,
     );
 
     const currentBuilding =

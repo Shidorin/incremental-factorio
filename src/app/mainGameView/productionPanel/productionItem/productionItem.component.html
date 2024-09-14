@@ -1,0 +1,10 @@
+<div class="production-bar">
+  <div (click)="handleClick()">
+    <p>name: {{ productName }}</p>
+    <p>quantity: {{ product.quantity }}</p>
+    <p>productionRate: {{ product.productionRate }}</p>
+    <p>assigned: {{ assigned }}</p>
+  </div>
+  <button (click)="handleAssemblerChangeButton(true)">+</button>
+  <button (click)="handleAssemblerChangeButton(false)">-</button>
+</div>

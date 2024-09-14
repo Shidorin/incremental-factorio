@@ -1,1 +1,10 @@
 <p>productionPanel works!</p>
+<ng-container *ngFor="let product of products">
+  <app-production-item
+    *ngIf="gameProgressService.isItemUnlocked(categories.PRODUCTS, product.key)"
+    [productName]="product.key"
+    [product]="product.value"
+    [assigned]="assemblerAssigned(product.key)"
+    (handleAssemblerAssignment)="handleAssemblerAssignment($event)"
+  ></app-production-item>
+</ng-container>

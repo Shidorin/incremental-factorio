@@ -92,7 +92,8 @@ export class BuildingCostCalculatorService {
         result = this.calculateFurnaceCost(buildingName, forNextPurchase);
         break;
       case BUILDINGS.LABS:
-        // result = this.calculateFurnaceCost(buildingName, forNextPurchase);
+        //general function before math
+        result = this.calculateFurnaceCost(buildingName, forNextPurchase);
         break;
       default:
         break;

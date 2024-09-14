@@ -3,6 +3,7 @@ import { interval, Subscription } from 'rxjs';
 import {
   BuildingService,
   MetalService,
+  ProductService,
   ResourceService,
 } from './gameState/index';
 import { GameProgressService } from './gameProgress';
@@ -18,7 +19,8 @@ export class GameLoopService {
     private buildingService: BuildingService,
     private resourceService: ResourceService,
     private gameProgressService: GameProgressService,
-    private metalService: MetalService
+    private metalService: MetalService,
+    private productService: ProductService,
   ) {}
 
   public startLoop(): void {
@@ -40,6 +42,7 @@ export class GameLoopService {
     this.buildingService.updateBuildingsLoop();
     this.resourceService.updateResourcesLoop();
     this.metalService.updateMetalsLoop();
+    this.productService.updateProductsLoop();
     this.gameProgressService.updateProgress();
   }
 }
