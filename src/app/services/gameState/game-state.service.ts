@@ -97,27 +97,12 @@ export class GameStateService {
             { name: PRODUCTS.IRON_GEAR_WHEEL, count: 1 },
           ],
         },
-        // belt: {
-        //   quantity: 0,
-        //   productionRate: 0,
-        //   recipe: [{ name: RESOURCES.IRON, count: 2, producedAmount: 1 }],
-        // },
-        // inserter: {
-        //   quantity: 0,
-        //   productionRate: 0,
-        //   recipe: [{ name: RESOURCES.IRON, count: 2, producedAmount: 1 }],
-        // },
-        // greenScience: {
-        //   quantity: 0,
-        //   productionRate: 0,
-        //   recipe: [{ name: RESOURCES.IRON, count: 2, producedAmount: 1 }],
-        // },
       },
       buildings: {
         drills: {
           name: BUILDINGS.DRILLS,
           quantity: 0,
-          fuelUsage: 0.5,
+          fuelUsage: 0,
           cost: {
             [RESOURCES.STONE]: { count: 5, baseCost: 5, scalingFactor: 1.6 },
             [RESOURCES.COAL]: { count: 5, baseCost: 5, scalingFactor: 1.6 },
@@ -127,7 +112,7 @@ export class GameStateService {
         furnaces: {
           name: BUILDINGS.FURNACES,
           quantity: 0,
-          fuelUsage: 1,
+          fuelUsage: 0,
           cost: {
             [RESOURCES.STONE]: { count: 5, baseCost: 5, scalingFactor: 1.6 },
           },
@@ -136,7 +121,7 @@ export class GameStateService {
         assemblers: {
           name: BUILDINGS.ASSEMBLERS,
           quantity: 0,
-          fuelUsage: 2,
+          fuelUsage: 0,
           cost: {
             [METALS.COPPER_PLATE]: {
               count: 5,
@@ -154,7 +139,7 @@ export class GameStateService {
         labs: {
           name: BUILDINGS.LABS,
           quantity: 0,
-          fuelUsage: 5,
+          fuelUsage: 0,
           cost: {
             [PRODUCTS.GREEN_CIRCUIT]: {
               count: 5,

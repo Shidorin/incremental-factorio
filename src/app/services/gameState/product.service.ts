@@ -1,7 +1,7 @@
 import { Injectable, WritableSignal } from '@angular/core';
 import { GameState } from 'src/app/interfaces';
 import { GameStateService } from './game-state.service';
-import { MetalName, ProductName } from 'src/app/constants/types';
+import { ProductName } from 'src/app/constants/types';
 
 @Injectable({
   providedIn: 'root',
@@ -14,18 +14,18 @@ export class ProductService {
   }
 
   /**
-   *  updates metals inside game loop
+   *  updates products inside game loop
    *  checks for overcap in production rate
    */
   public updateProductsLoop(): void {
-    const metals = this.gameStateSignal().player.metals;
+    const products = this.gameStateSignal().player.products;
 
-    Object.keys(metals).forEach((metalName) => {
-      const metal = metals[metalName as MetalName];
-      metal.quantity += metal.productionRate;
+    Object.keys(products).forEach((productName) => {
+      const product = products[productName as ProductName];
+      product.quantity += product.productionRate;
     });
 
-    this.gameStateService.updateMetals(metals);
+    this.gameStateService.updateProducts(products);
   }
 
   public isProduct(name: string): name is ProductName {

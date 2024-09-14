@@ -6,7 +6,7 @@ import {
   Product,
   Resource,
 } from 'src/app/interfaces';
-import { BUILDINGS, RESOURCES } from 'src/app/constants/enums';
+import { BUILDINGS, CATEGORIES, RESOURCES } from 'src/app/constants/enums';
 import {
   BuildingName,
   MetalName,
@@ -84,40 +84,85 @@ export class BuildingService {
 
   /**
    * checks recipe for active assemblers
-   *  subtracts resources
+   *  decreases production rate
    *  updates production rates
-   * @param productionRates for specific metal
+   * @param productionRates
    */
-  private furnaceJob(
-    metalName: MetalName,
+  private buildingJob(
+    jobName: MetalName | ProductName,
     productionRates: {
       resources: { [resource in ResourceName]?: number };
       metals: { [metal in MetalName]?: number };
       products: { [product in ProductName]?: number };
-    }
+    },
+    jobType: CATEGORIES.METALS | CATEGORIES.PRODUCTS
   ): void {
     const resources = this.gameStateSignal().player.resources;
-    const metal = this.gameStateSignal().player.metals[metalName];
+    const metals = this.gameStateSignal().player.metals;
+    const products = this.gameStateSignal().player.products;
 
-    for (const recipeItem of metal.recipe) {
-      const availableQuantity = resources[recipeItem.name].quantity;
+    const job =
+      jobType === CATEGORIES.METALS
+        ? metals[jobName as MetalName]
+        : products[jobName as ProductName];
+
+    for (const recipeItem of job.recipe) {
+      let availableQuantity = 0;
+
+      if (this.resourceService.isResource(recipeItem.name)) {
+        availableQuantity = resources[recipeItem.name as ResourceName].quantity;
+      } else if (this.metalService.isMetal(recipeItem.name)) {
+        availableQuantity = metals[recipeItem.name as MetalName].quantity;
+      } else if (this.productService.isProduct(recipeItem.name)) {
+        availableQuantity = products[recipeItem.name as ProductName].quantity;
+      }
 
       if (availableQuantity < recipeItem.count) {
-        // console.warn(`Not enough ${recipeItem.resourceName}. Required: ${recipeItem.count}, available: ${availableQuantity}`);
         return;
       }
     }
 
-    metal.recipe.forEach((recipeItem) => {
-      if (productionRates.resources[recipeItem.name] === undefined) {
-        productionRates.resources[recipeItem.name] = 0;
+    job.recipe.forEach((recipeItem) => {
+      if (this.resourceService.isResource(recipeItem.name)) {
+        if (
+          productionRates.resources[recipeItem.name as ResourceName] ===
+          undefined
+        ) {
+          productionRates.resources[recipeItem.name as ResourceName] = 0;
+        }
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        productionRates.resources[recipeItem.name as ResourceName]! -=
+          recipeItem.count;
+      } else if (this.metalService.isMetal(recipeItem.name)) {
+        if (
+          productionRates.metals[recipeItem.name as MetalName] === undefined
+        ) {
+          productionRates.metals[recipeItem.name as MetalName] = 0;
+        }
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        productionRates.metals[recipeItem.name as MetalName]! -=
+          recipeItem.count;
+      } else if (this.productService.isProduct(recipeItem.name)) {
+        if (
+          productionRates.products[recipeItem.name as ProductName] === undefined
+        ) {
+          productionRates.products[recipeItem.name as ProductName] = 0;
+        }
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        productionRates.products[recipeItem.name as ProductName]! -=
+          recipeItem.count;
       }
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      productionRates.resources[recipeItem.name]! -= recipeItem.count;
     });
 
-    productionRates.metals[metalName] =
-      (productionRates.metals[metalName] || 0) + metal.producedAmount;
+    if (jobType === CATEGORIES.METALS) {
+      productionRates.metals[jobName as MetalName] =
+        (productionRates.metals[jobName as MetalName] || 0) +
+        job.producedAmount;
+    } else if (jobType === CATEGORIES.PRODUCTS) {
+      productionRates.products[jobName as ProductName] =
+        (productionRates.products[jobName as ProductName] || 0) +
+        job.producedAmount;
+    }
   }
 
   /**
@@ -173,11 +218,10 @@ export class BuildingService {
               (productionRates.resources[resource] || 0) + 1;
           } else if (this.metalService.isMetal(job)) {
             const metal: MetalName = job as MetalName;
-            this.furnaceJob(metal, productionRates);
+            this.buildingJob(metal, productionRates, CATEGORIES.METALS);
           } else if (this.productService.isProduct(job)) {
             const product: ProductName = job as ProductName;
-            productionRates.products[product] =
-              (productionRates.products[product] || 0) + 1;
+            this.buildingJob(product, productionRates, CATEGORIES.PRODUCTS);
           }
         }
       });
@@ -358,6 +402,49 @@ export class BuildingService {
     };
     this.gameStateService.updateSingleBuilding(
       BUILDINGS.FURNACES,
+      buildingUpdates
+    );
+  }
+
+  /**
+   * handles assigments of furnaces, player can increment or decrement drill assignment to resource
+   * @todo could be generalized for every building
+   * @param isIncrement if true increment, if false decrement
+   * @param name resource name
+   */
+  public handleAssemblerAssignment(isIncrement: boolean, name: ProductName) {
+    const assemblers =
+      this.gameStateSignal().player.buildings[BUILDINGS.ASSEMBLERS];
+    if (!assemblers || !assemblers.assignments) {
+      return;
+    }
+    const activeAssignments = assemblers.assignments.filter(
+      (assignment) =>
+        assignment.job === name && assignment.status === STATUS.ACTIVE
+    );
+    if (isIncrement) {
+      const inactiveAssignment = assemblers.assignments.find(
+        (assignment) => assignment.status === STATUS.INACTIVE
+      );
+      if (inactiveAssignment) {
+        inactiveAssignment.status = STATUS.ACTIVE;
+        inactiveAssignment.job = name;
+      } else {
+        console.warn('No inactive assemblers available to assign.');
+      }
+    } else {
+      if (activeAssignments.length > 0) {
+        activeAssignments[0].status = STATUS.INACTIVE;
+        activeAssignments[0].job = undefined;
+      } else {
+        console.warn(`No active assemblers assigned to ${name} to deactivate.`);
+      }
+    }
+    const buildingUpdates: Partial<Building> = {
+      assignments: [...assemblers.assignments],
+    };
+    this.gameStateService.updateSingleBuilding(
+      BUILDINGS.ASSEMBLERS,
       buildingUpdates
     );
   }
