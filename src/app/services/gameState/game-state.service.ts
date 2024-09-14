@@ -2,7 +2,12 @@ import { Injectable, signal, WritableSignal } from '@angular/core';
 import { GameState, Metal, Resource } from '../../interfaces';
 import { BuildingName, MetalName, ResourceName } from 'src/app/constants/types';
 import { Building } from 'src/app/interfaces/game-state/building.interface';
-import { BUILDINGS, METALS, RESOURCES } from 'src/app/constants/enums';
+import {
+  BUILDINGS,
+  METALS,
+  PRODUCTS,
+  RESOURCES,
+} from 'src/app/constants/enums';
 
 @Injectable({
   providedIn: 'root',
@@ -40,27 +45,68 @@ export class GameStateService {
         copperPlate: {
           quantity: 5,
           productionRate: 0,
-          recipe: [{ resourceName: RESOURCES.COPPER, count: 1 }],
+          producedAmount: 1,
+          recipe: [{ name: RESOURCES.COPPER, count: 1 }],
         },
         ironPlate: {
           quantity: 5,
           productionRate: 0,
-          recipe: [{ resourceName: RESOURCES.IRON, count: 1 }],
+          producedAmount: 1,
+          recipe: [{ name: RESOURCES.IRON, count: 1 }],
         },
         steel: {
           quantity: 0,
           productionRate: 0,
-          recipe: [{ resourceName: RESOURCES.IRON, count: 2 }],
+          producedAmount: 1,
+          recipe: [{ name: RESOURCES.IRON, count: 2 }],
         },
       },
       products: {
-        copperCable: 0,
-        ironGearWheel: 0,
-        greenCircuit: 0,
-        belt: 0,
-        inserter: 0,
-        redScience: 0,
-        greenScience: 0,
+        copperCable: {
+          quantity: 0,
+          productionRate: 0,
+          producedAmount: 2,
+          recipe: [{ name: METALS.COPPER_PLATE, count: 1 }],
+        },
+        ironGearWheel: {
+          quantity: 0,
+          productionRate: 0,
+          producedAmount: 1,
+          recipe: [{ name: METALS.IRON_PLATE, count: 2 }],
+        },
+        greenCircuit: {
+          quantity: 0,
+          productionRate: 0,
+          producedAmount: 1,
+          recipe: [
+            { name: PRODUCTS.COPPER_CABLE, count: 3 },
+            { name: METALS.IRON_PLATE, count: 1 },
+          ],
+        },
+        redScience: {
+          quantity: 0,
+          productionRate: 0,
+          producedAmount: 1,
+          recipe: [
+            { name: METALS.COPPER_PLATE, count: 1 },
+            { name: PRODUCTS.IRON_GEAR_WHEEL, count: 1 },
+          ],
+        },
+        // belt: {
+        //   quantity: 0,
+        //   productionRate: 0,
+        //   recipe: [{ name: RESOURCES.IRON, count: 2, producedAmount: 1 }],
+        // },
+        // inserter: {
+        //   quantity: 0,
+        //   productionRate: 0,
+        //   recipe: [{ name: RESOURCES.IRON, count: 2, producedAmount: 1 }],
+        // },
+        // greenScience: {
+        //   quantity: 0,
+        //   productionRate: 0,
+        //   recipe: [{ name: RESOURCES.IRON, count: 2, producedAmount: 1 }],
+        // },
       },
       buildings: {
         drills: {
@@ -68,8 +114,8 @@ export class GameStateService {
           quantity: 0,
           fuelUsage: 0.5,
           cost: {
-            stone: { count: 5, baseCost: 5, scalingFactor: 1.6 },
-            coal: { count: 5, baseCost: 5, scalingFactor: 1.6 },
+            [RESOURCES.STONE]: { count: 5, baseCost: 5, scalingFactor: 1.6 },
+            [RESOURCES.COAL]: { count: 5, baseCost: 5, scalingFactor: 1.6 },
           },
           assignments: [],
         },
@@ -77,7 +123,9 @@ export class GameStateService {
           name: BUILDINGS.FURNACES,
           quantity: 0,
           fuelUsage: 1,
-          cost: { stone: { count: 5, baseCost: 5, scalingFactor: 1.6 } },
+          cost: {
+            [RESOURCES.STONE]: { count: 5, baseCost: 5, scalingFactor: 1.6 },
+          },
           assignments: [],
         },
         assemblers: {
@@ -102,7 +150,18 @@ export class GameStateService {
           name: BUILDINGS.LABS,
           quantity: 0,
           fuelUsage: 5,
-          cost: { stone: { count: 5, baseCost: 5, scalingFactor: 1.6 } },
+          cost: {
+            [PRODUCTS.GREEN_CIRCUIT]: {
+              count: 5,
+              baseCost: 5,
+              scalingFactor: 1.6,
+            },
+            [PRODUCTS.IRON_GEAR_WHEEL]: {
+              count: 5,
+              baseCost: 5,
+              scalingFactor: 1.6,
+            },
+          },
           assignments: [],
         },
       },
@@ -156,7 +215,7 @@ export class GameStateService {
    * @param resourceUpdates - An object containing the resource names and their new values.
    */
   public updateResources(
-    resourceUpdates: Partial<Record<ResourceName, Partial<Resource>>>,
+    resourceUpdates: Partial<Record<ResourceName, Partial<Resource>>>
   ): void {
     this.gameStateSignal.update((current: GameState) => {
       const updatedResources = { ...current.player.resources };
@@ -183,7 +242,7 @@ export class GameStateService {
    * @param metalUpdates - An object containing the resource names and their new values.
    */
   public updateMetals(
-    metalUpdates: Partial<Record<MetalName, Partial<Metal>>>,
+    metalUpdates: Partial<Record<MetalName, Partial<Metal>>>
   ): void {
     this.gameStateSignal.update((current: GameState) => {
       const updatedMetals = { ...current.player.metals };
@@ -207,7 +266,7 @@ export class GameStateService {
 
   public updateSingleBuilding(
     buildingName: BuildingName,
-    updates: Partial<Building>,
+    updates: Partial<Building>
   ): void {
     this.gameStateSignal.update((current: GameState) => ({
       ...current,
@@ -225,7 +284,7 @@ export class GameStateService {
   }
 
   public updateBuildings(
-    buildingUpdates: Partial<Record<BuildingName, Partial<Building>>>,
+    buildingUpdates: Partial<Record<BuildingName, Partial<Building>>>
   ): void {
     this.gameStateSignal.update((current: GameState) => {
       const updatedBuildings = { ...current.player.buildings };

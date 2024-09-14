@@ -27,7 +27,7 @@ export class GameProgressService {
    */
   public isItemUnlocked<T extends keyof ProgressState['unlockedItems']>(
     category: T,
-    itemName: ProgressState['unlockedItems'][T][number],
+    itemName: ProgressState['unlockedItems'][T][number]
   ): boolean {
     const items = this.gameState().progressState.unlockedItems[category];
     return (items as Array<typeof itemName>).includes(itemName);
@@ -40,7 +40,7 @@ export class GameProgressService {
    */
   public unlockItem<T extends keyof ProgressState['unlockedItems']>(
     category: T,
-    itemName: ProgressState['unlockedItems'][T][number],
+    itemName: ProgressState['unlockedItems'][T][number]
   ): void {
     const items = this.gameState().progressState.unlockedItems[category];
     if (Array.isArray(items)) {
@@ -90,27 +90,27 @@ export class GameProgressService {
     // UNLOCK PRODUCTS
     if (
       !this.isItemUnlocked(CATEGORIES.PRODUCTS, PRODUCTS.COPPER_CABLE) &&
-      !this.isItemUnlocked(CATEGORIES.PRODUCTS, PRODUCTS.GREEN_SCIENCE) &&
+      !this.isItemUnlocked(CATEGORIES.PRODUCTS, PRODUCTS.GREEN_CIRCUIT) &&
       this.gameState().player.buildings.assemblers.quantity > 1
     ) {
       this.unlockItem(CATEGORIES.PRODUCTS, PRODUCTS.COPPER_CABLE);
-      this.unlockItem(CATEGORIES.PRODUCTS, PRODUCTS.GREEN_SCIENCE);
+      this.unlockItem(CATEGORIES.PRODUCTS, PRODUCTS.GREEN_CIRCUIT);
     }
 
     // UNLOCK RED SCIENCE
-    // if (
-    //   !this.isItemUnlocked(CATEGORIES.PRODUCTS, PRODUCTS.RED_SCIENCE) &&
-    //   this.gameState().player.products.greenCircuit.quantity > 1
-    // ) {
-    //   this.unlockItem(CATEGORIES.PRODUCTS, PRODUCTS.RED_SCIENCE);
-    // }
+    if (
+      !this.isItemUnlocked(CATEGORIES.PRODUCTS, PRODUCTS.RED_SCIENCE) &&
+      this.gameState().player.products.greenCircuit.quantity > 1
+    ) {
+      this.unlockItem(CATEGORIES.PRODUCTS, PRODUCTS.RED_SCIENCE);
+    }
 
     // UNLOCK LABS
-    // if (
-    //   !this.isItemUnlocked(CATEGORIES.BUILDINGS, BUILDINGS.LABS) &&
-    //   this.gameState().player.products.redScience.quantity > 0
-    // ) {
-    //   this.unlockItem(CATEGORIES.BUILDINGS, BUILDINGS.LABS);
-    // }
+    if (
+      !this.isItemUnlocked(CATEGORIES.BUILDINGS, BUILDINGS.LABS) &&
+      this.gameState().player.products.redScience.quantity > 0
+    ) {
+      this.unlockItem(CATEGORIES.BUILDINGS, BUILDINGS.LABS);
+    }
   }
 }
