@@ -20,7 +20,7 @@ export class GameLoopService {
     private resourceService: ResourceService,
     private gameProgressService: GameProgressService,
     private metalService: MetalService,
-    private productService: ProductService
+    private productService: ProductService,
   ) {}
 
   public startLoop(): void {

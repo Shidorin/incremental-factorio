@@ -37,7 +37,7 @@ export class ResourcePanelComponent {
       (count, { job }) => {
         return job === resourceName ? count + 1 : count;
       },
-      0
+      0,
     );
   }
 
@@ -48,7 +48,7 @@ export class ResourcePanelComponent {
   public handleDrillAssignment(payload: handleDrillChange) {
     this.buildingService.handleDrillAssignment(
       payload.isDrillIncrement,
-      payload.resourceName
+      payload.resourceName,
     );
   }
 }

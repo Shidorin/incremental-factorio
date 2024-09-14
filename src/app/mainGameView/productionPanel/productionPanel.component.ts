@@ -5,7 +5,7 @@ import { GameState, handleAssemblerChange, Product } from 'src/app/interfaces';
 import { BUILDINGS, CATEGORIES } from 'src/app/constants/enums';
 import { GameProgressService } from 'src/app/services/gameProgress';
 import { GameStateService, BuildingService } from 'src/app/services/gameState';
-import { ProductionItemComponent } from "./productionItem/productionItem.component";
+import { ProductionItemComponent } from './productionItem/productionItem.component';
 
 @Component({
   selector: 'app-production-panel',
@@ -43,14 +43,14 @@ export class ProductionPanelComponent {
     this.products = Object.entries(this.signal().player.products).map(
       ([key, value]) => {
         return { key: key as ProductName, value };
-      }
+      },
     );
   }
 
   public handleAssemblerAssignment(payload: handleAssemblerChange) {
     this.buildingService.handleAssemblerAssignment(
       payload.isIncrement,
-      payload.name
+      payload.name,
     );
   }
 }

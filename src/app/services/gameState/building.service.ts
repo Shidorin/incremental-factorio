@@ -37,7 +37,7 @@ export class BuildingService {
     private buildingManager: BuildingManagerService,
     private resourceService: ResourceService,
     private metalService: MetalService,
-    private productService: ProductService
+    private productService: ProductService,
   ) {
     this.gameStateSignal = this.gameStateService.getSignal();
   }
@@ -54,7 +54,7 @@ export class BuildingService {
       this.buildingManager.purchaseBuilding(
         buildingName,
         this.costCalculator.calculateBuildingCost(buildingName),
-        (current) => current.player.buildings[buildingName].quantity + 1
+        (current) => current.player.buildings[buildingName].quantity + 1,
       );
     }
   }
@@ -95,7 +95,7 @@ export class BuildingService {
       metals: { [metal in MetalName]?: number };
       products: { [product in ProductName]?: number };
     },
-    jobType: CATEGORIES.METALS | CATEGORIES.PRODUCTS
+    jobType: CATEGORIES.METALS | CATEGORIES.PRODUCTS,
   ): void {
     const resources = this.gameStateSignal().player.resources;
     const metals = this.gameStateSignal().player.metals;
@@ -184,7 +184,7 @@ export class BuildingService {
     Object.keys(this.gameStateSignal().player.resources).forEach(
       (resourceName) => {
         productionRates.resources[resourceName as ResourceName] = 0;
-      }
+      },
     );
 
     Object.keys(this.gameStateSignal().player.metals).forEach((metalName) => {
@@ -194,7 +194,7 @@ export class BuildingService {
     Object.keys(this.gameStateSignal().player.products).forEach(
       (productName) => {
         productionRates.products[productName as ProductName] = 0;
-      }
+      },
     );
 
     const totalCoalUsage = this.calculateBuildingsCoalUsage();
@@ -284,7 +284,7 @@ export class BuildingService {
 
       for (const priority of priorityOrder) {
         const buildingsOfPriority = buildings.filter(
-          (building) => building.name === priority
+          (building) => building.name === priority,
         );
 
         buildingsOfPriority.sort((a, b) => a.id - b.id);
@@ -314,7 +314,7 @@ export class BuildingService {
    */
   public handleDrillAssignment(
     isDrillIncrement: boolean,
-    resourceName: ResourceName
+    resourceName: ResourceName,
   ) {
     const drills = this.gameStateSignal().player.buildings.drills;
 
@@ -324,12 +324,12 @@ export class BuildingService {
 
     const activeAssignments = drills.assignments.filter(
       (assignment) =>
-        assignment.job === resourceName && assignment.status === STATUS.ACTIVE
+        assignment.job === resourceName && assignment.status === STATUS.ACTIVE,
     );
 
     if (isDrillIncrement) {
       const inactiveAssignment = drills.assignments.find(
-        (assignment) => assignment.status === STATUS.INACTIVE
+        (assignment) => assignment.status === STATUS.INACTIVE,
       );
 
       if (inactiveAssignment) {
@@ -344,7 +344,7 @@ export class BuildingService {
         activeAssignments[0].job = undefined;
       } else {
         console.warn(
-          `No active drills assigned to ${resourceName} to deactivate.`
+          `No active drills assigned to ${resourceName} to deactivate.`,
         );
       }
     }
@@ -355,7 +355,7 @@ export class BuildingService {
 
     this.gameStateService.updateSingleBuilding(
       BUILDINGS.DRILLS,
-      buildingUpdates
+      buildingUpdates,
     );
   }
 
@@ -367,7 +367,7 @@ export class BuildingService {
    */
   public handleFurnaceAssignment(
     isFurnaceIncrement: boolean,
-    metalName: MetalName
+    metalName: MetalName,
   ) {
     const furnaces = this.gameStateSignal().player.buildings.furnaces;
     if (!furnaces || !furnaces.assignments) {
@@ -375,11 +375,11 @@ export class BuildingService {
     }
     const activeAssignments = furnaces.assignments.filter(
       (assignment) =>
-        assignment.job === metalName && assignment.status === STATUS.ACTIVE
+        assignment.job === metalName && assignment.status === STATUS.ACTIVE,
     );
     if (isFurnaceIncrement) {
       const inactiveAssignment = furnaces.assignments.find(
-        (assignment) => assignment.status === STATUS.INACTIVE
+        (assignment) => assignment.status === STATUS.INACTIVE,
       );
       if (inactiveAssignment) {
         inactiveAssignment.status = STATUS.ACTIVE;
@@ -393,7 +393,7 @@ export class BuildingService {
         activeAssignments[0].job = undefined;
       } else {
         console.warn(
-          `No active furnaces assigned to ${metalName} to deactivate.`
+          `No active furnaces assigned to ${metalName} to deactivate.`,
         );
       }
     }
@@ -402,7 +402,7 @@ export class BuildingService {
     };
     this.gameStateService.updateSingleBuilding(
       BUILDINGS.FURNACES,
-      buildingUpdates
+      buildingUpdates,
     );
   }
 
@@ -420,11 +420,11 @@ export class BuildingService {
     }
     const activeAssignments = assemblers.assignments.filter(
       (assignment) =>
-        assignment.job === name && assignment.status === STATUS.ACTIVE
+        assignment.job === name && assignment.status === STATUS.ACTIVE,
     );
     if (isIncrement) {
       const inactiveAssignment = assemblers.assignments.find(
-        (assignment) => assignment.status === STATUS.INACTIVE
+        (assignment) => assignment.status === STATUS.INACTIVE,
       );
       if (inactiveAssignment) {
         inactiveAssignment.status = STATUS.ACTIVE;
@@ -445,7 +445,7 @@ export class BuildingService {
     };
     this.gameStateService.updateSingleBuilding(
       BUILDINGS.ASSEMBLERS,
-      buildingUpdates
+      buildingUpdates,
     );
   }
 }

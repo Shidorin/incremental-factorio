@@ -27,7 +27,7 @@ export class GameProgressService {
    */
   public isItemUnlocked<T extends keyof ProgressState['unlockedItems']>(
     category: T,
-    itemName: ProgressState['unlockedItems'][T][number]
+    itemName: ProgressState['unlockedItems'][T][number],
   ): boolean {
     const items = this.gameState().progressState.unlockedItems[category];
     return (items as Array<typeof itemName>).includes(itemName);
@@ -40,7 +40,7 @@ export class GameProgressService {
    */
   public unlockItem<T extends keyof ProgressState['unlockedItems']>(
     category: T,
-    itemName: ProgressState['unlockedItems'][T][number]
+    itemName: ProgressState['unlockedItems'][T][number],
   ): void {
     const items = this.gameState().progressState.unlockedItems[category];
     if (Array.isArray(items)) {

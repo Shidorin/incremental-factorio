@@ -205,7 +205,7 @@ export class GameStateService {
    * @param resourceUpdates - An object containing the resource names and their new values.
    */
   public updateResources(
-    resourceUpdates: Partial<Record<ResourceName, Partial<Resource>>>
+    resourceUpdates: Partial<Record<ResourceName, Partial<Resource>>>,
   ): void {
     this.gameStateSignal.update((current: GameState) => {
       const updatedResources = { ...current.player.resources };
@@ -232,7 +232,7 @@ export class GameStateService {
    * @param metalUpdates - An object containing the resource names and their new values.
    */
   public updateMetals(
-    metalUpdates: Partial<Record<MetalName, Partial<Metal>>>
+    metalUpdates: Partial<Record<MetalName, Partial<Metal>>>,
   ): void {
     this.gameStateSignal.update((current: GameState) => {
       const updatedMetals = { ...current.player.metals };
@@ -259,7 +259,7 @@ export class GameStateService {
    * @param productUpdates - An object containing the resource names and their new values.
    */
   public updateProducts(
-    productUpdates: Partial<Record<ProductName, Partial<Product>>>
+    productUpdates: Partial<Record<ProductName, Partial<Product>>>,
   ): void {
     this.gameStateSignal.update((current: GameState) => {
       const updatedProducts = { ...current.player.products };
@@ -283,7 +283,7 @@ export class GameStateService {
 
   public updateSingleBuilding(
     buildingName: BuildingName,
-    updates: Partial<Building>
+    updates: Partial<Building>,
   ): void {
     this.gameStateSignal.update((current: GameState) => ({
       ...current,
@@ -301,7 +301,7 @@ export class GameStateService {
   }
 
   public updateBuildings(
-    buildingUpdates: Partial<Record<BuildingName, Partial<Building>>>
+    buildingUpdates: Partial<Record<BuildingName, Partial<Building>>>,
   ): void {
     this.gameStateSignal.update((current: GameState) => {
       const updatedBuildings = { ...current.player.buildings };
