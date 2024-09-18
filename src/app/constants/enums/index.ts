@@ -4,3 +4,4 @@ export * from './buildings';
 export * from './products';
 export * from './categories';
 export * from './metals';
+export * from './panels';

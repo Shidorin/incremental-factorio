@@ -22,18 +22,18 @@ export class ResourcePanelComponent {
   public gameStateService: GameStateService;
   public resourceService: ResourceService;
   public buildingService: BuildingService;
-  public signal: WritableSignal<GameState>;
+  public gameStateSignal: WritableSignal<GameState>;
   public categories = CATEGORIES;
 
   public constructor(protected gameProgressService: GameProgressService) {
     this.gameStateService = inject(GameStateService);
     this.resourceService = inject(ResourceService);
     this.buildingService = inject(BuildingService);
-    this.signal = this.gameStateService.getSignal();
+    this.gameStateSignal = this.gameStateService.getSignal();
   }
 
   drillsAssigned(resourceName: ResourceName) {
-    return this.signal().player.buildings.drills.assignments.reduce(
+    return this.gameStateSignal().player.buildings.drills.assignments.reduce(
       (count, { job }) => {
         return job === resourceName ? count + 1 : count;
       },

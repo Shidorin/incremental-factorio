@@ -10,6 +10,7 @@ import { Building } from 'src/app/interfaces/game-state/building.interface';
 import {
   BUILDINGS,
   METALS,
+  PANELS,
   PRODUCTS,
   RESOURCES,
 } from 'src/app/constants/enums';
@@ -176,7 +177,7 @@ export class GameStateService {
       notificationsOn: true,
     },
     uiState: {
-      currentScreen: 'main',
+      currentPanel: PANELS.MAIN,
       popupsSeen: [],
       resourcePanelExpanded: true,
     },

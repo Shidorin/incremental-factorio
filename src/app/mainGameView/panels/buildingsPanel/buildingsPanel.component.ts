@@ -17,13 +17,13 @@ import { CATEGORIES } from 'src/app/constants/enums';
 export class BuildingsPanelComponent {
   public gameStateService: GameStateService;
   public buildingService: BuildingService;
-  public signal: WritableSignal<GameState>;
+  public gameStateSignal: WritableSignal<GameState>;
   public categories = CATEGORIES;
 
   public constructor(protected gameProgressService: GameProgressService) {
     this.gameStateService = inject(GameStateService);
     this.buildingService = inject(BuildingService);
-    this.signal = this.gameStateService.getSignal();
+    this.gameStateSignal = this.gameStateService.getSignal();
   }
 
   handleChange(buildingName: BuildingName) {

@@ -1,11 +1,18 @@
-import { Component, inject, OnInit, OnDestroy } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ResourcePanelComponent } from './resourcePanel/resourcePanel.component';
-import { BuildingItemComponent } from './buildingsPanel/buildingItem/buildingItem.component';
-import { BuildingsPanelComponent } from './buildingsPanel/buildingsPanel.component';
 import { GameLoopService } from '../services/game-loop.service';
-import { MetalPanelComponent } from './metalPanel/metalPanel.component';
-import { ProductionPanelComponent } from './productionPanel/productionPanel.component';
+import { GameStateService } from '../services/gameState';
+import { PANELS } from '../constants/enums';
+import {
+  BuildingsPanelComponent,
+  MetalPanelComponent,
+  ProductionPanelComponent,
+  ResourcePanelComponent,
+  SciencePanelComponent,
+} from './panels';
+
+import { MatTabsModule } from '@angular/material/tabs';
+import { GameState } from '../interfaces';
 
 @Component({
   selector: 'app-main-game-view',
@@ -13,18 +20,28 @@ import { ProductionPanelComponent } from './productionPanel/productionPanel.comp
   imports: [
     CommonModule,
     ResourcePanelComponent,
-    BuildingItemComponent,
     BuildingsPanelComponent,
     MetalPanelComponent,
     ProductionPanelComponent,
+    SciencePanelComponent,
+    MatTabsModule,
   ],
   templateUrl: './mainGameView.component.html',
   styleUrl: './mainGameView.component.scss',
 })
 export class MainGameViewComponent implements OnInit, OnDestroy {
   private gameLoopService: GameLoopService;
-  constructor() {
+  public tabIndex = 0;
+  public panels = PANELS;
+
+  constructor(private gameStateService: GameStateService) {
     this.gameLoopService = inject(GameLoopService);
+
+    effect(() => {
+      const currentPanel =
+        this.gameStateService.getSignal()().uiState.currentPanel;
+      this.tabIndex = Object.values(this.panels).indexOf(currentPanel);
+    });
   }
 
   ngOnInit(): void {
@@ -33,5 +50,17 @@ export class MainGameViewComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.gameLoopService.stopLoop();
+  }
+
+  onTabChange(index: number): void {
+    this.gameStateService.getSignal().update((current: GameState) => {
+      return {
+        ...current,
+        uiState: {
+          ...current.uiState,
+          currentPanel: Object.values(this.panels)[index],
+        },
+      };
+    });
   }
 }

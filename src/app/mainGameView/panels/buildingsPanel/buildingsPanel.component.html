@@ -1,5 +1,5 @@
 <p>buildingsPanel works!</p>
-<ng-container *ngFor="let building of signal().player.buildings | keyvalue">
+<ng-container *ngFor="let building of gameStateSignal().player.buildings | keyvalue">
   <app-building-item
     *ngIf="
       gameProgressService.isItemUnlocked(categories.BUILDINGS, building.key)
