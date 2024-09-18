@@ -17,14 +17,14 @@ import { MetalName } from 'src/app/constants/types';
 export class MetalPanelComponent {
   public gameStateService: GameStateService;
   public buildingService: BuildingService;
-  public signal: WritableSignal<GameState>;
+  public gameStateSignal: WritableSignal<GameState>;
   public metals: { key: MetalName; value: Metal }[] = [];
   public categories = CATEGORIES;
 
   public constructor(protected gameProgressService: GameProgressService) {
     this.gameStateService = inject(GameStateService);
     this.buildingService = inject(BuildingService);
-    this.signal = this.gameStateService.getSignal();
+    this.gameStateSignal = this.gameStateService.getSignal();
 
     effect(() => {
       this.updateMetals();
@@ -32,7 +32,7 @@ export class MetalPanelComponent {
   }
 
   furnaceAssigned(metalName: MetalName) {
-    return this.signal().player.buildings.furnaces.assignments.reduce(
+    return this.gameStateSignal().player.buildings.furnaces.assignments.reduce(
       (count, { job }) => {
         return job === metalName ? count + 1 : count;
       },
@@ -41,7 +41,7 @@ export class MetalPanelComponent {
   }
 
   private updateMetals(): void {
-    this.metals = Object.entries(this.signal().player.metals).map(
+    this.metals = Object.entries(this.gameStateSignal().player.metals).map(
       ([key, value]) => {
         return { key: key as MetalName, value };
       },

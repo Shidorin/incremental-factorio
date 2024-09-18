@@ -1,7 +1,17 @@
 <p>mainGameView works!</p>
-<main class="game-window">
-  <app-resource-panel></app-resource-panel>
-  <app-buildings-panel></app-buildings-panel>
-  <app-metal-panel></app-metal-panel>
-  <app-production-panel></app-production-panel>
-</main>
+<mat-tab-group
+  [(selectedIndex)]="tabIndex"
+  (selectedIndexChange)="onTabChange($event)"
+>
+  <mat-tab [label]="panels.MAIN">
+    <div class="game-window">
+      <app-resource-panel></app-resource-panel>
+      <app-buildings-panel></app-buildings-panel>
+      <app-metal-panel></app-metal-panel>
+      <app-production-panel></app-production-panel>
+    </div>
+  </mat-tab>
+  <mat-tab [label]="panels.SCIENCE">
+    <app-science-panel></app-science-panel
+  ></mat-tab>
+</mat-tab-group>

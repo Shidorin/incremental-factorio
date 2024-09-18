@@ -17,14 +17,14 @@ import { ProductionItemComponent } from './productionItem/productionItem.compone
 export class ProductionPanelComponent {
   public gameStateService: GameStateService;
   public buildingService: BuildingService;
-  public signal: WritableSignal<GameState>;
+  public gameStateSignal: WritableSignal<GameState>;
   public products: { key: ProductName; value: Product }[] = [];
   public categories = CATEGORIES;
 
   public constructor(protected gameProgressService: GameProgressService) {
     this.gameStateService = inject(GameStateService);
     this.buildingService = inject(BuildingService);
-    this.signal = this.gameStateService.getSignal();
+    this.gameStateSignal = this.gameStateService.getSignal();
 
     effect(() => {
       this.updateProducts();
@@ -32,7 +32,7 @@ export class ProductionPanelComponent {
   }
 
   assemblerAssigned(productName: ProductName) {
-    return this.signal().player.buildings[
+    return this.gameStateSignal().player.buildings[
       BUILDINGS.ASSEMBLERS
     ].assignments.reduce((count, { job }) => {
       return job === productName ? count + 1 : count;
@@ -40,7 +40,7 @@ export class ProductionPanelComponent {
   }
 
   private updateProducts(): void {
-    this.products = Object.entries(this.signal().player.products).map(
+    this.products = Object.entries(this.gameStateSignal().player.products).map(
       ([key, value]) => {
         return { key: key as ProductName, value };
       },
