@@ -1,5 +1,5 @@
 import { Injectable, WritableSignal } from '@angular/core';
-import { BuildingName, ResourceName } from 'src/app/constants/types';
+import { BuildingName, OreName } from 'src/app/constants/types';
 import { BuildingCost, GameState } from 'src/app/interfaces';
 import { GameStateService } from '../game-state.service';
 import { BUILDINGS } from 'src/app/constants/enums';
@@ -29,7 +29,7 @@ export class BuildingCostCalculatorService {
     const quantity = building.quantity + (forNextPurchase ? 1 : 0);
 
     Object.entries(building.cost).forEach(([key, value]) => {
-      const resourceKey = key as ResourceName;
+      const resourceKey = key as OreName;
       result[resourceKey] = {
         ...value,
         count: Math.ceil(
@@ -56,7 +56,7 @@ export class BuildingCostCalculatorService {
     const quantity = building.quantity + (forNextPurchase ? 1 : 0);
 
     Object.entries(building.cost).forEach(([key, value]) => {
-      const resourceKey = key as ResourceName;
+      const resourceKey = key as OreName;
       result[resourceKey] = {
         ...value,
         count: Math.ceil(

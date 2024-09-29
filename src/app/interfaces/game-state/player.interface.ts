@@ -1,14 +1,14 @@
 import {
   BuildingTypes,
   PlayerMetals,
-  PlayerResources,
+  PlayerOres,
   PlayerProducts,
   Progression,
   Upgrades,
 } from './';
 
 export interface Player {
-  resources: PlayerResources;
+  ores: PlayerOres;
   buildings: BuildingTypes;
   metals: PlayerMetals;
   products: PlayerProducts;

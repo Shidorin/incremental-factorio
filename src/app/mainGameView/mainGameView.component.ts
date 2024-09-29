@@ -7,7 +7,7 @@ import {
   BuildingsPanelComponent,
   MetalPanelComponent,
   ProductionPanelComponent,
-  ResourcePanelComponent,
+  OrePanelComponent,
   SciencePanelComponent,
 } from './panels';
 
@@ -19,7 +19,7 @@ import { GameState } from '../interfaces';
   standalone: true,
   imports: [
     CommonModule,
-    ResourcePanelComponent,
+    OrePanelComponent,
     BuildingsPanelComponent,
     MetalPanelComponent,
     ProductionPanelComponent,

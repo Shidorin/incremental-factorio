@@ -1,7 +1,7 @@
-import { MetalName, ResourceName, ProductName } from './';
+import { MetalName, OreName, ProductName } from './';
 
 export type BuildingCost = {
-  [resourceName in ResourceName | ProductName | MetalName]?: {
+  [resourceName in OreName | ProductName | MetalName]?: {
     count: number;
     baseCost: number;
     scalingFactor: number;

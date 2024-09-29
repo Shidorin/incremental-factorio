@@ -1,0 +1,11 @@
+<p>resourcePanel works!</p>
+<ng-container *ngFor="let ore of gameStateSignal().player.ores | keyvalue">
+  <app-resource-item
+    *ngIf="gameProgressService.isItemUnlocked(categories.ORES, ore.key)"
+    [oreName]="ore.key"
+    [ore]="ore.value"
+    [assigned]="drillsAssigned(ore.key)"
+    (increment)="handleChange($event)"
+    (handleDrillAssignment)="handleDrillAssignment($event)"
+  ></app-resource-item>
+</ng-container>

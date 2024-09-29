@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { ResourceService } from './resource.service';
+import { OreService } from './ore.service';
 
-describe('ResourceService', () => {
-  let service: ResourceService;
+describe('OreService', () => {
+  let service: OreService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(ResourceService);
+    service = TestBed.inject(OreService);
   });
 
   it('should be created', () => {

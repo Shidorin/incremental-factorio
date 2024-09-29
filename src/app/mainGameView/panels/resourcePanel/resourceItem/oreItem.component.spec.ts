@@ -1,16 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ResourcePanelComponent } from './resourcePanel.component';
+import { OreItemComponent } from './oreItem.component';
 
-describe('ResourcePanelComponent', () => {
-  let component: ResourcePanelComponent;
-  let fixture: ComponentFixture<ResourcePanelComponent>;
+describe('ResourceItemComponent', () => {
+  let component: OreItemComponent;
+  let fixture: ComponentFixture<OreItemComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ResourcePanelComponent],
+      imports: [OreItemComponent],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(ResourcePanelComponent);
+    fixture = TestBed.createComponent(OreItemComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

@@ -1,3 +1,3 @@
-export type ResourceName = 'coal' | 'stone' | 'iron' | 'copper';
+export type OreName = 'coal' | 'stone' | 'iron' | 'copper';
 // | 'oil'
 // | 'uran';

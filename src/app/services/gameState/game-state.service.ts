@@ -1,10 +1,10 @@
 import { Injectable, signal, WritableSignal } from '@angular/core';
-import { GameState, Metal, Product, Resource } from '../../interfaces';
+import { GameState, Metal, Product, Ore } from '../../interfaces';
 import {
   BuildingName,
   MetalName,
   ProductName,
-  ResourceName,
+  OreName,
 } from 'src/app/constants/types';
 import { Building } from 'src/app/interfaces/game-state/building.interface';
 import {
@@ -12,7 +12,7 @@ import {
   METALS,
   PANELS,
   PRODUCTS,
-  RESOURCES,
+  ORES,
 } from 'src/app/constants/enums';
 
 @Injectable({
@@ -21,27 +21,27 @@ import {
 export class GameStateService {
   private initialGameState: GameState = {
     player: {
-      resources: {
+      ores: {
         stone: {
-          name: RESOURCES.STONE,
+          name: ORES.STONE,
           quantity: 15,
           productionRate: 0,
           capacity: 20,
         },
         coal: {
-          name: RESOURCES.COAL,
+          name: ORES.COAL,
           quantity: 15,
           productionRate: 0,
           capacity: 20,
         },
         copper: {
-          name: RESOURCES.COPPER,
+          name: ORES.COPPER,
           quantity: 10,
           productionRate: 0,
           capacity: 10,
         },
         iron: {
-          name: RESOURCES.IRON,
+          name: ORES.IRON,
           quantity: 10,
           productionRate: 0,
           capacity: 10,
@@ -52,19 +52,19 @@ export class GameStateService {
           quantity: 5,
           productionRate: 0,
           producedAmount: 1,
-          recipe: [{ name: RESOURCES.COPPER, count: 1 }],
+          recipe: [{ name: ORES.COPPER, count: 1 }],
         },
         ironPlate: {
           quantity: 5,
           productionRate: 0,
           producedAmount: 1,
-          recipe: [{ name: RESOURCES.IRON, count: 1 }],
+          recipe: [{ name: ORES.IRON, count: 1 }],
         },
         steel: {
           quantity: 0,
           productionRate: 0,
           producedAmount: 1,
-          recipe: [{ name: RESOURCES.IRON, count: 2 }],
+          recipe: [{ name: ORES.IRON, count: 2 }],
         },
       },
       products: {
@@ -105,8 +105,8 @@ export class GameStateService {
           quantity: 0,
           fuelUsage: 0,
           cost: {
-            [RESOURCES.STONE]: { count: 5, baseCost: 5, scalingFactor: 1.6 },
-            [RESOURCES.COAL]: { count: 5, baseCost: 5, scalingFactor: 1.6 },
+            [ORES.STONE]: { count: 5, baseCost: 5, scalingFactor: 1.6 },
+            [ORES.COAL]: { count: 5, baseCost: 5, scalingFactor: 1.6 },
           },
           assignments: [],
         },
@@ -115,7 +115,7 @@ export class GameStateService {
           quantity: 0,
           fuelUsage: 0,
           cost: {
-            [RESOURCES.STONE]: { count: 5, baseCost: 5, scalingFactor: 1.6 },
+            [ORES.STONE]: { count: 5, baseCost: 5, scalingFactor: 1.6 },
           },
           assignments: [],
         },
@@ -183,7 +183,7 @@ export class GameStateService {
     },
     progressState: {
       unlockedItems: {
-        resources: [RESOURCES.COAL, RESOURCES.STONE],
+        ores: [ORES.COAL, ORES.STONE],
         buildings: [BUILDINGS.DRILLS],
         metals: [],
         products: [],
@@ -203,17 +203,17 @@ export class GameStateService {
 
   /**
    * Update specific resources in the game state.
-   * @param resourceUpdates - An object containing the resource names and their new values.
+   * @param oreUpdates - An object containing the resource names and their new values.
    */
-  public updateResources(
-    resourceUpdates: Partial<Record<ResourceName, Partial<Resource>>>,
+  public updateOres(
+    oreUpdates: Partial<Record<OreName, Partial<Ore>>>,
   ): void {
     this.gameStateSignal.update((current: GameState) => {
-      const updatedResources = { ...current.player.resources };
+      const updatedOres = { ...current.player.ores };
 
-      Object.entries(resourceUpdates).forEach(([resourceName, updates]) => {
-        updatedResources[resourceName as ResourceName] = {
-          ...updatedResources[resourceName as ResourceName],
+      Object.entries(oreUpdates).forEach(([oreName, updates]) => {
+        updatedOres[oreName as OreName] = {
+          ...updatedOres[oreName as OreName],
           ...updates,
         };
       });
@@ -222,7 +222,7 @@ export class GameStateService {
         ...current,
         player: {
           ...current.player,
-          resources: updatedResources,
+          ores: updatedOres,
         },
       };
     });

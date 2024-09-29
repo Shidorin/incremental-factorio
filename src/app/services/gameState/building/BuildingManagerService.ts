@@ -4,11 +4,11 @@ import {
   BuildingName,
   MetalName,
   ProductName,
-  ResourceName,
+  OreName,
   STATUS,
 } from 'src/app/constants/types';
 import {
-  Resource,
+  Ore,
   GameState,
   Building,
   Metal,
@@ -18,7 +18,7 @@ import {
   GameStateService,
   MetalService,
   ProductService,
-  ResourceService,
+  OreService,
 } from '../';
 import { BuildingCostCalculatorService } from './';
 
@@ -31,7 +31,7 @@ export class BuildingManagerService {
   constructor(
     private gameStateService: GameStateService,
     private costCalculator: BuildingCostCalculatorService,
-    private resourceService: ResourceService,
+    private resourceService: OreService,
     private metalService: MetalService,
     private productService: ProductService,
   ) {
@@ -44,13 +44,13 @@ export class BuildingManagerService {
    * @returns true if can be afforded.
    */
   public canAfford(costs: BuildingCost): boolean {
-    const resources = this.gameStateSignal().player.resources;
+    const resources = this.gameStateSignal().player.ores;
     const metals = this.gameStateSignal().player.metals;
     const products = this.gameStateSignal().player.products;
 
     return Object.entries(costs).every(([itemName, cost]) => {
       if (itemName in resources) {
-        return resources[itemName as ResourceName]?.quantity >= cost.count;
+        return resources[itemName as OreName]?.quantity >= cost.count;
       }
 
       if (itemName in metals) {
@@ -70,16 +70,16 @@ export class BuildingManagerService {
    * @param cost - Cost of the building.
    */
   private deductItem(cost: BuildingCost): void {
-    const resourceUpdates: Partial<Record<ResourceName, Partial<Resource>>> =
+    const resourceUpdates: Partial<Record<OreName, Partial<Ore>>> =
       {};
     const metalUpdates: Partial<Record<MetalName, Partial<Metal>>> = {};
     const productUpdates: Partial<Record<ProductName, Partial<Product>>> = {};
 
     Object.entries(cost).forEach(([itemName, amount]) => {
-      if (this.resourceService.isResource(itemName)) {
+      if (this.resourceService.isOre(itemName)) {
         resourceUpdates[itemName] = {
           quantity:
-            (this.gameStateSignal().player.resources[itemName]?.quantity || 0) -
+            (this.gameStateSignal().player.ores[itemName]?.quantity || 0) -
             amount.count,
         };
       } else if (this.metalService.isMetal(itemName)) {
@@ -97,7 +97,7 @@ export class BuildingManagerService {
       }
     });
 
-    this.gameStateService.updateResources(resourceUpdates);
+    this.gameStateService.updateOres(resourceUpdates);
     this.gameStateService.updateMetals(metalUpdates);
     this.gameStateService.updateProducts(productUpdates);
   }

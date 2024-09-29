@@ -4,14 +4,14 @@ import {
   GameState,
   Metal,
   Product,
-  Resource,
+  Ore,
 } from 'src/app/interfaces';
-import { BUILDINGS, CATEGORIES, RESOURCES } from 'src/app/constants/enums';
+import { BUILDINGS, CATEGORIES, ORES } from 'src/app/constants/enums';
 import {
   BuildingName,
   MetalName,
   ProductName,
-  ResourceName,
+  OreName,
   STATUS,
 } from 'src/app/constants/types';
 import {
@@ -22,7 +22,7 @@ import {
   GameStateService,
   MetalService,
   ProductService,
-  ResourceService,
+  OreService,
 } from './';
 
 @Injectable({
@@ -35,7 +35,7 @@ export class BuildingService {
     private gameStateService: GameStateService,
     private costCalculator: BuildingCostCalculatorService,
     private buildingManager: BuildingManagerService,
-    private resourceService: ResourceService,
+    private oreService: OreService,
     private metalService: MetalService,
     private productService: ProductService,
   ) {
@@ -91,13 +91,13 @@ export class BuildingService {
   private buildingJob(
     jobName: MetalName | ProductName,
     productionRates: {
-      resources: { [resource in ResourceName]?: number };
+      ores: { [ore in OreName]?: number };
       metals: { [metal in MetalName]?: number };
       products: { [product in ProductName]?: number };
     },
     jobType: CATEGORIES.METALS | CATEGORIES.PRODUCTS,
   ): void {
-    const resources = this.gameStateSignal().player.resources;
+    const ores = this.gameStateSignal().player.ores;
     const metals = this.gameStateSignal().player.metals;
     const products = this.gameStateSignal().player.products;
 
@@ -109,8 +109,8 @@ export class BuildingService {
     for (const recipeItem of job.recipe) {
       let availableQuantity = 0;
 
-      if (this.resourceService.isResource(recipeItem.name)) {
-        availableQuantity = resources[recipeItem.name as ResourceName].quantity;
+      if (this.oreService.isOre(recipeItem.name)) {
+        availableQuantity = ores[recipeItem.name as OreName].quantity;
       } else if (this.metalService.isMetal(recipeItem.name)) {
         availableQuantity = metals[recipeItem.name as MetalName].quantity;
       } else if (this.productService.isProduct(recipeItem.name)) {
@@ -123,15 +123,15 @@ export class BuildingService {
     }
 
     job.recipe.forEach((recipeItem) => {
-      if (this.resourceService.isResource(recipeItem.name)) {
+      if (this.oreService.isOre(recipeItem.name)) {
         if (
-          productionRates.resources[recipeItem.name as ResourceName] ===
+          productionRates.ores[recipeItem.name as OreName] ===
           undefined
         ) {
-          productionRates.resources[recipeItem.name as ResourceName] = 0;
+          productionRates.ores[recipeItem.name as OreName] = 0;
         }
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        productionRates.resources[recipeItem.name as ResourceName]! -=
+        productionRates.ores[recipeItem.name as OreName]! -=
           recipeItem.count;
       } else if (this.metalService.isMetal(recipeItem.name)) {
         if (
@@ -172,18 +172,18 @@ export class BuildingService {
     const buildings = this.gameStateSignal().player.buildings;
 
     const productionRates: {
-      resources: { [resource in ResourceName]?: number };
+      ores: { [ore in OreName]?: number };
       metals: { [metal in MetalName]?: number };
       products: { [product in ProductName]?: number };
     } = {
-      resources: {},
+      ores: {},
       metals: {},
       products: {},
     };
 
-    Object.keys(this.gameStateSignal().player.resources).forEach(
-      (resourceName) => {
-        productionRates.resources[resourceName as ResourceName] = 0;
+    Object.keys(this.gameStateSignal().player.ores).forEach(
+      (oreName) => {
+        productionRates.ores[oreName as OreName] = 0;
       },
     );
 
@@ -200,8 +200,8 @@ export class BuildingService {
     const totalCoalUsage = this.calculateBuildingsCoalUsage();
 
     if (totalCoalUsage > 0) {
-      productionRates.resources.coal =
-        (productionRates.resources.coal || 0) - totalCoalUsage;
+      productionRates.ores.coal =
+        (productionRates.ores.coal || 0) - totalCoalUsage;
       this.deactivateBuildingsIfNeeded(totalCoalUsage);
     }
 
@@ -212,10 +212,10 @@ export class BuildingService {
         if (assignment.status === STATUS.ACTIVE && assignment.job) {
           const job = assignment.job;
 
-          if (this.resourceService.isResource(job)) {
-            const resource: ResourceName = job as ResourceName;
-            productionRates.resources[resource] =
-              (productionRates.resources[resource] || 0) + 1;
+          if (this.oreService.isOre(job)) {
+            const ore: OreName = job as OreName;
+            productionRates.ores[ore] =
+              (productionRates.ores[ore] || 0) + 1;
           } else if (this.metalService.isMetal(job)) {
             const metal: MetalName = job as MetalName;
             this.buildingJob(metal, productionRates, CATEGORIES.METALS);
@@ -233,18 +233,18 @@ export class BuildingService {
    * Updates resource production rates
    */
   private updateProductionRates(productionRates: {
-    resources: { [resource in ResourceName]?: number };
+    ores: { [resource in OreName]?: number };
     metals: { [metal in MetalName]?: number };
     products: { [product in ProductName]?: number };
   }) {
-    const resourceUpdates: Partial<Record<ResourceName, Partial<Resource>>> =
+    const oreUpdates: Partial<Record<OreName, Partial<Ore>>> =
       {};
     const metalUpdates: Partial<Record<MetalName, Partial<Metal>>> = {};
     const productUpdates: Partial<Record<ProductName, Partial<Product>>> = {};
 
-    Object.keys(productionRates.resources).forEach((resourceName) => {
-      resourceUpdates[resourceName as ResourceName] = {
-        productionRate: productionRates.resources[resourceName as ResourceName],
+    Object.keys(productionRates.ores).forEach((oreName) => {
+      oreUpdates[oreName as OreName] = {
+        productionRate: productionRates.ores[oreName as OreName],
       };
     });
 
@@ -260,7 +260,7 @@ export class BuildingService {
       };
     });
 
-    this.gameStateService.updateResources(resourceUpdates);
+    this.gameStateService.updateOres(oreUpdates);
     this.gameStateService.updateMetals(metalUpdates);
     this.gameStateService.updateProducts(productUpdates);
   }
@@ -270,9 +270,9 @@ export class BuildingService {
    * @param requiredCoalUsage count of negative coal usage
    */
   private deactivateBuildingsIfNeeded(requiredCoalUsage: number): void {
-    const coalResource = this.gameStateSignal().player.resources.coal;
+    const coalOre = this.gameStateSignal().player.ores.coal;
 
-    if (coalResource.quantity < requiredCoalUsage) {
+    if (coalOre.quantity < requiredCoalUsage) {
       const buildings = Object.values(this.gameStateSignal().player.buildings);
 
       const priorityOrder = [
@@ -291,10 +291,10 @@ export class BuildingService {
 
         for (const building of buildingsOfPriority) {
           for (const assignment of building.assignments) {
-            if (coalResource.quantity >= requiredCoalUsage) break;
+            if (coalOre.quantity >= requiredCoalUsage) break;
             if (
               assignment.status === STATUS.ACTIVE &&
-              assignment.job !== RESOURCES.COAL
+              assignment.job !== ORES.COAL
             ) {
               assignment.status = STATUS.INACTIVE;
               assignment.job = undefined;
@@ -310,11 +310,11 @@ export class BuildingService {
    * handles assigments of drills, player can increment or decrement drill assignment to resource
    * @todo could be generalized for every building
    * @param isDrillIncrement if true increment, if false decrement
-   * @param resourceName resource name
+   * @param oreName resource name
    */
   public handleDrillAssignment(
     isDrillIncrement: boolean,
-    resourceName: ResourceName,
+    oreName: OreName,
   ) {
     const drills = this.gameStateSignal().player.buildings.drills;
 
@@ -324,7 +324,7 @@ export class BuildingService {
 
     const activeAssignments = drills.assignments.filter(
       (assignment) =>
-        assignment.job === resourceName && assignment.status === STATUS.ACTIVE,
+        assignment.job === oreName && assignment.status === STATUS.ACTIVE,
     );
 
     if (isDrillIncrement) {
@@ -334,7 +334,7 @@ export class BuildingService {
 
       if (inactiveAssignment) {
         inactiveAssignment.status = STATUS.ACTIVE;
-        inactiveAssignment.job = resourceName;
+        inactiveAssignment.job = oreName;
       } else {
         console.warn('No inactive drills available to assign.');
       }
@@ -344,7 +344,7 @@ export class BuildingService {
         activeAssignments[0].job = undefined;
       } else {
         console.warn(
-          `No active drills assigned to ${resourceName} to deactivate.`,
+          `No active drills assigned to ${oreName} to deactivate.`,
         );
       }
     }

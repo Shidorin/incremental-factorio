@@ -1,4 +1,4 @@
-export * from './resourcePanel/resourcePanel.component';
+export * from './resourcePanel/orePanel.component';
 export * from './metalPanel/metalPanel.component';
 export * from './productionPanel/productionPanel.component';
 export * from './buildingsPanel/buildingsPanel.component';

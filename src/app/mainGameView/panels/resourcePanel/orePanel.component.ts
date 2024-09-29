@@ -1,54 +1,54 @@
 import { Component, inject, WritableSignal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ResourceItemComponent } from './resourceItem/resourceItem.component';
+import { OreItemComponent } from './resourceItem/oreItem.component';
 import { GameState, handleDrillChange } from 'src/app/interfaces/';
 import {
   BuildingService,
   GameStateService,
-  ResourceService,
+  OreService,
 } from 'src/app/services/gameState';
-import { ResourceName } from 'src/app/constants/types';
+import { OreName } from 'src/app/constants/types';
 import { GameProgressService } from 'src/app/services/gameProgress';
 import { CATEGORIES } from 'src/app/constants/enums';
 
 @Component({
   selector: 'app-resource-panel',
   standalone: true,
-  imports: [CommonModule, ResourceItemComponent],
-  templateUrl: './resourcePanel.component.html',
-  styleUrl: './resourcePanel.component.scss',
+  imports: [CommonModule, OreItemComponent],
+  templateUrl: './orePanel.component.html',
+  styleUrl: './orePanel.component.scss',
 })
-export class ResourcePanelComponent {
+export class OrePanelComponent {
   public gameStateService: GameStateService;
-  public resourceService: ResourceService;
+  public oreService: OreService;
   public buildingService: BuildingService;
   public gameStateSignal: WritableSignal<GameState>;
   public categories = CATEGORIES;
 
   public constructor(protected gameProgressService: GameProgressService) {
     this.gameStateService = inject(GameStateService);
-    this.resourceService = inject(ResourceService);
+    this.oreService = inject(OreService);
     this.buildingService = inject(BuildingService);
     this.gameStateSignal = this.gameStateService.getSignal();
   }
 
-  drillsAssigned(resourceName: ResourceName) {
+  drillsAssigned(oreName: OreName) {
     return this.gameStateSignal().player.buildings.drills.assignments.reduce(
       (count, { job }) => {
-        return job === resourceName ? count + 1 : count;
+        return job === oreName ? count + 1 : count;
       },
       0,
     );
   }
 
-  public handleChange(resourceName: ResourceName) {
-    this.resourceService.incrementResource(resourceName);
+  public handleChange(oreName: OreName) {
+    this.oreService.incrementOre(oreName);
   }
 
   public handleDrillAssignment(payload: handleDrillChange) {
     this.buildingService.handleDrillAssignment(
       payload.isDrillIncrement,
-      payload.resourceName,
+      payload.oreName,
     );
   }
 }

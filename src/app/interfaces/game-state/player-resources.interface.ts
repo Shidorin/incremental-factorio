@@ -1,10 +1,10 @@
-import { Resource } from './';
+import { Ore } from './';
 
-export interface PlayerResources {
-  coal: Resource;
-  stone: Resource;
-  iron: Resource;
-  copper: Resource;
+export interface PlayerOres {
+  coal: Ore;
+  stone: Ore;
+  iron: Ore;
+  copper: Ore;
   // oil: Resource;
   // uran: Resource;
 }

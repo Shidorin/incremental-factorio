@@ -3,7 +3,7 @@ import {
   ProductName,
   MetalName,
   STATUS,
-  ResourceName,
+  OreName,
 } from 'src/app/constants/types';
 
 export interface Building {
@@ -16,5 +16,5 @@ export interface Building {
 
 export interface assignment {
   status: STATUS;
-  job?: ResourceName | ProductName | MetalName;
+  job?: OreName | ProductName | MetalName;
 }

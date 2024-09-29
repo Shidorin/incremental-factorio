@@ -1,6 +1,6 @@
-import { ResourceName } from 'src/app/constants/types';
+import { OreName } from 'src/app/constants/types';
 
-export interface Resource {
+export interface Ore {
   name: string;
   quantity: number;
   productionRate: number;
@@ -9,5 +9,5 @@ export interface Resource {
 
 export interface handleDrillChange {
   isDrillIncrement: boolean;
-  resourceName: ResourceName;
+  oreName: OreName;
 }

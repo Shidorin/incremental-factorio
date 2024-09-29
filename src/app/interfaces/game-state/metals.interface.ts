@@ -1,4 +1,4 @@
-import { MetalName, ResourceName } from 'src/app/constants/types';
+import { MetalName, OreName } from 'src/app/constants/types';
 
 export type PlayerMetals = {
   [metalName in MetalName]: Metal;
@@ -9,7 +9,7 @@ export interface Metal {
   productionRate: number;
   producedAmount: number;
   recipe: {
-    name: ResourceName;
+    name: OreName;
     count: number;
   }[];
 }

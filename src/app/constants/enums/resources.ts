@@ -1,4 +1,4 @@
-export enum RESOURCES {
+export enum ORES {
   COAL = 'coal',
   STONE = 'stone',
   IRON = 'iron',

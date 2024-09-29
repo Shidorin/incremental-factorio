@@ -4,7 +4,7 @@ import {
   BuildingService,
   MetalService,
   ProductService,
-  ResourceService,
+  OreService,
 } from './gameState/index';
 import { GameProgressService } from './gameProgress';
 
@@ -17,7 +17,7 @@ export class GameLoopService {
 
   constructor(
     private buildingService: BuildingService,
-    private resourceService: ResourceService,
+    private oreService: OreService,
     private gameProgressService: GameProgressService,
     private metalService: MetalService,
     private productService: ProductService,
@@ -40,7 +40,7 @@ export class GameLoopService {
 
   private updateGameState(): void {
     this.buildingService.updateBuildingsLoop();
-    this.resourceService.updateResourcesLoop();
+    this.oreService.updateOresLoop();
     this.metalService.updateMetalsLoop();
     this.productService.updateProductsLoop();
     this.gameProgressService.updateProgress();

@@ -2,12 +2,12 @@ import {
   BuildingName,
   MetalName,
   ProductName,
-  ResourceName,
+  OreName,
 } from 'src/app/constants/types';
 
 export interface ProgressState {
   unlockedItems: {
-    resources: ResourceName[];
+    ores: OreName[];
     metals: MetalName[];
     buildings: BuildingName[];
     products: ProductName[];

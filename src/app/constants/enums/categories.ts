@@ -1,5 +1,5 @@
 export enum CATEGORIES {
-  RESOURCES = 'resources',
+  ORES = 'ores',
   BUILDINGS = 'buildings',
   METALS = 'metals',
   PRODUCTS = 'products',

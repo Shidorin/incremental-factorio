@@ -1,4 +1,4 @@
-import { MetalName, ProductName, ResourceName } from 'src/app/constants/types';
+import { MetalName, ProductName, OreName } from 'src/app/constants/types';
 
 export type PlayerProducts = {
   [productName in ProductName]: Product;
@@ -9,7 +9,7 @@ export interface Product {
   productionRate: number;
   producedAmount: number;
   recipe: {
-    name: ResourceName | MetalName | ProductName;
+    name: OreName | MetalName | ProductName;
     count: number;
   }[];
 }
@@ -20,7 +20,7 @@ export interface handleAssemblerChange {
 }
 
 export type BuildingCost = {
-  [resourceName in ResourceName]?: {
+  [resourceName in OreName]?: {
     count: number;
     baseCost: number;
     scalingFactor: number;

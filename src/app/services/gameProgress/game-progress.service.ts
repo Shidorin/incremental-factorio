@@ -6,7 +6,7 @@ import {
   CATEGORIES,
   METALS,
   PRODUCTS,
-  RESOURCES,
+  ORES,
 } from 'src/app/constants/enums';
 
 @Injectable({
@@ -61,18 +61,18 @@ export class GameProgressService {
     }
     // UNLOCK COPPER AND IRON
     if (
-      !this.isItemUnlocked(CATEGORIES.RESOURCES, RESOURCES.COPPER) &&
+      !this.isItemUnlocked(CATEGORIES.ORES, ORES.COPPER) &&
       this.gameState().player.buildings.furnaces.quantity > 0
     ) {
-      this.unlockItem(CATEGORIES.RESOURCES, RESOURCES.COPPER);
-      this.unlockItem(CATEGORIES.RESOURCES, RESOURCES.IRON);
+      this.unlockItem(CATEGORIES.ORES, ORES.COPPER);
+      this.unlockItem(CATEGORIES.ORES, ORES.IRON);
     }
 
     // UNLOCK COPPER_PLATE IRON_PLATE
     if (
       !this.isItemUnlocked(CATEGORIES.METALS, METALS.COPPER_PLATE) &&
-      this.gameState().player.resources.copper.quantity > 0 &&
-      this.gameState().player.resources.iron.quantity > 0
+      this.gameState().player.ores.copper.quantity > 0 &&
+      this.gameState().player.ores.iron.quantity > 0
     ) {
       this.unlockItem(CATEGORIES.METALS, METALS.COPPER_PLATE);
       this.unlockItem(CATEGORIES.METALS, METALS.IRON_PLATE);
